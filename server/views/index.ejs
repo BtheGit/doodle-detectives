@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Landing Page</title>
+</head>
+<body>
+  <h1>GAMES MENU</h1>
+  <% if(locals.user) {%>
+    <p>Welcome <%=locals.user.name%> </p>
+    <div><a href="/doodle/lobby">Doodle Detectives</a></div>
+    <div><a href="/tetris/lobby">Tetris</a></div>
+    <div><a href="/user/profile">Profile</a></div>
+    <div><a href="/user/logout">Logout</a></div>
+  <% } else { %>
+    <div><a href="/user/register">Register</a></div>
+    <div><a href="/user/login">Login</a></div>
+  <% } %>
+  <a href="/private"></a>
+</body>
+</html>

@@ -1,0 +1,15 @@
+<div>NAVBAR GOES HERE</div>
+<!-- This bit will become a general partial for most pages -->
+<% if (locals.flashes)  { %>
+	<% const cats = Object.keys(locals.flashes) %>
+	<% cats.forEach(cat => { %>
+		<% locals.flashes[cat].forEach(el => { %>
+			<div class="flash flash-<%=cat%>">
+				<p><%= el %></p>
+			</div>
+		<% }) %>
+	<% }) %>
+<% }  %>
+
+
+

@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Login</title>
+</head>
+<body>
+
+	<%- include ../partials/navTemplate.ejs %>
+
+	<h2>Profile</h2>
+	<form action="/user/profile" method="POST">
+		<label for="name">Name</label>
+		<input type="text" name="name" value=<%= user.name %>>
+		<label for="email">Email</label> (You will need to log back in with new email)
+		<input type="email" name="email" value=<%= user.email %>>
+		<button type="submit">Update Account</button>
+	</form>
+	
+</body>
+</html>

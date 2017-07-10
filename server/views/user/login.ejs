@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Login</title>
+</head>
+<body>
+
+<%- include ../partials/navTemplate.ejs %>
+
+<div class="login-page">
+	<div class="header-container">
+		<h2>Login</h2>
+	</div>
+  <div class="form">
+    <form class="login-form" action="/user/login" method="POST">
+      <input type="email" name="email" placeholder="Email"/>
+      <input type="password" name="password" placeholder="Password"/>
+      <button type="submit" value="Log In">Log In</button>
+      <p class="message">Not registered? <a href="/user/register">Create an account</a></p>
+    </form>
+  </div>
+  <div class="form">
+    <form class="forgot-form" action="/user/account/forgot" method="POST">
+      <label for="email">Email</label>
+      <input type="email" name="email">
+      <button type="submit">Reset Password</button>
+    </form>
+  </div>
+</div>
+	
+</body>
+</html>

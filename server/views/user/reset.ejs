@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Reset Password</title>
+</head>
+<body>
+
+  <%- include ../partials/navTemplate.ejs %>
+
+  <h2>Reset</h2>
+  <div class="form">
+  <!-- Without a specified route it uses the current one preserving the token in the params -->
+    <form class="reset-form" method="POST">
+      <input type="password" name="password" placeholder="Password..."/>
+      <input type="password" name="password-confirm" placeholder="Confirm password..."/>
+      <button type="submit" value="Log In">Reset Password</button>
+    </form>
+  </div>
+
+	
+</body>
+</html>
