@@ -31,16 +31,11 @@ class GameSession {
 	}
 
 	addVoteToBegin(client) {
-		// if()
-		// this.votedToBegin = [...this.votedToBegin, client];
 		this.votedToBegin.add(client)
 		this._updateVoteStatus();
 	}
 
 	removeVoteToBegin(client) {
-		// this.votedToBegin = this.votedToBegin.filter(elem => {
-		// 	return elem.id !== client.id;
-		// })
 		this.votedToBegin.delete(client);
 		this._updateVoteStatus();
 	}
@@ -135,10 +130,9 @@ class GameSession {
 		this.currentSessionStatus = 'isGameActive';
 		//Create a copy of players for the game to manipulate without affecting session members
 		const players = this._createPlayerList();
-		//Create new instance of a game (Games will only be used once)
+		//Games will not be recycled. Each game will be a new instance.
 		this.game = new Game(this, players)
-		//return this.game so it's accessible to socket.io
-		//OR. Sockets are available in this.clients, so nevermind
+		this.broadcastSessionState();
 	}
 
 	//This will be the player list that the Game instance manipulates and broadcasts to. 

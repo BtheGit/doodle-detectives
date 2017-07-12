@@ -47,11 +47,11 @@
           for (let i = 0; i < array.length; i++) {
             const link = array[i].pop >= 5 
                             ? `<p class="full-button">ROOM FULL</p>` 
-                            : `<a class="join-button" href="doodle/room#${array[i].room}">JOIN</a>`
+                            : `<a class="join-button" href="doodle/room/${array[i].sessionId}">JOIN</a>`
             const room =
                    `<div class="roomContainer">
                     <div class="roomName">
-                      ${array[i].room}
+                      ${array[i].clients}
                     </div>
                     <div class="roomPop">
                       ${array[i].pop} / 5

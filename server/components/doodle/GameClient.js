@@ -1,5 +1,5 @@
 class GameClient {
-	constructor(socket, name, id) {
+	constructor(socket = null, name, id) {
 		this.socket = socket;
 		this.name = name;
 		this.id = id;
