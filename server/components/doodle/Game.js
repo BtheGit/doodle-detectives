@@ -57,7 +57,7 @@ class Game {
 		//Players leaving or not participating will wreck the game.
 		//Game variables
 		this.state = {
-			isGameDisplayingClue: true,
+			isGameDisplayingSecret: true,
 			isDrawingPhase: false,
 			isVotingForFake: false,
 			isVotingForGuess: false,
@@ -72,18 +72,27 @@ class Game {
 		}
 
 		//Initialize Game
+		console.log('Setting up new game')
 		this._setupNewGame(players);
-		console.log(this.state)
+		console.log('Displaying Secret')
+		this._displaySecret(this.state.currentSecret)
+		console.log('Starting turn progression')
+		setTimeout(() => this._nextTurn([...this.state.turnList]), 5000)
+		console.log('Turns finished')
+		// setTimeout(this._gameLoop, 5000) //For now nextturn, can put all logic in generator gameloop later or await/async
 		//setTimeoutfor5seconds to begin first turn
 		//at the end of each turn is an if statement
 		//---if not last turn settimeout for next turn
 		//---else settimeout for voting phase 1
 	}
 
+	/**
+	 * Generate a random fake artist for the round from array of players
+	 * by adding additional isFake boolean property to player objects
+	 * @param {Array} players  [array of players passed to the constructor]
+	 * @return {Array} [players array with one player isFake set to true, the rest to false]
+	 */
 	_setFakePlayer(players) {
-		//Randomly choose player as fake
-		//Map array of player objects adding isFake property
-		//replace old array
 		const fake = players[Math.floor(Math.random() * players.length)]
 		players = players.map(player => {
 			const isFake = player.id === fake.id ? true : false;
@@ -140,20 +149,34 @@ class Game {
 			const packet = {
 				type: 'display_secret_phase',
 				payload: {
-					category: this.state.currentSecret.category,
-					secret: `${player.isFake ? 'XXX' : this.state.currentSecret.secret}`
+					category: secret.category,
+					secret: `${player.isFake ? 'XXX' : secret.secret}`
 				}
 			}
 			player.socket.emit('packet', packet)
 		});
-		
+	}
+
+	_nextTurn(turns) {
+		if(!turns) {
+			return
+		}
+		else {
+			//1)Do action
+			console.log('Broadcasting turn')
+			// this.broadcastTurn()
+			//2) Shift off first (completed) turn
+			console.log('Removing completed turn')
+			turns.shift()
+			console.log('Turns remaining: ', turns.length)
+			//3) Call nextTurn with remaining turns on a timeout
+			setTimeout((turns) => this._nextTurn(turns), 5000)
+		}
 	}
 
 	_gameLoop() {
-		this._displaySecret(this.state.secret);
-		//wait 10 seconds
-		while(turnList.length) {
-			const turn = turnList.shift()
+		while(this.state.turnList.length) {
+			const turn = this.state.turnList.shift()
 			this._nextTurn(turn)
 			//wait 30 seconds
 		}

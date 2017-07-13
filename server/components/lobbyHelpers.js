@@ -8,7 +8,7 @@ exports.generateSessionsList = (map) => {
 	rooms.forEach(([sessionId, session]) => {
 		//Convert Set into Array to extract names
 		let clients = Array.from([...session.clients]);
-		clients = clients.map(client => client.name).join(',');
+		clients = clients.map(client => client.name).join(', ');
 		const pop = session.clients.size;
 		sessionsList.push({sessionId, clients, pop})
 	})

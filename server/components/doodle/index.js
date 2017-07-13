@@ -42,7 +42,6 @@ function doodle(io) {
 			session.broadcastSessionState();
 			//Initiate Packet Handlers
 			gameroomSocketHandlers(socket, client, session, gameSessionsMap);
-			session.initGame()
 		})
 	})
 }

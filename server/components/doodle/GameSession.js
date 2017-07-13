@@ -17,7 +17,7 @@ class GameSession {
 		this.chatLog = [];
 		this.currentSessionStatus = 'isWaitingForPlayers';
 		this.game = null;
-		// setTimeout(() => this.initGame(), 3000)
+		setTimeout(() => this.initGame(), 3000)
 		// this.usedSecrets = [] //figure out the best way to track variables like secrets/scores between games
 	}
 
