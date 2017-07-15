@@ -49,41 +49,41 @@ const shuffleArray = (array) => {
   return array;
 }
 
+//Game phase constants used in state updates to client to control flow
+const DISPLAYSECRET = 'DISPLAYSECRET',
+			DRAWING 			= 'DRAWING',
+			FAKEVOTE 			= 'FAKEVOTE',
+			GUESSVOTE 		= 'GUESSVOTE',
+			GAMEOVER 			= 'GAMEOVER';
+
 class Game {
 	constructor(session, players) {
 		//Give us access to session socket handlers for broadcasting
 		this.session = session; 
 		//NB: For the current implementation, the players cannot change after this point.
 		//Players leaving or not participating will wreck the game.
-		//Game variables
+
+		//Note to historians: Containing this in a state object was initially for the purposes of sending the
+		//whole thing in search of El Dorado. WOuld have found it too if it weren't for you meddling kids.
 		this.state = {
-			isGameDisplayingSecret: true,
-			isDrawingPhase: false,
-			isVotingForFake: false,
-			isVotingForGuess: false,
-			isGameOver: false,
+			currentPhase: '',
 			playerList: [],
 			activePlayer: [],
-			currentSecret: {
+			secret: {
 				category: '',
 				secret: ''
 			},
-			turnList: null,
+			turnList: null, //{id, name, socket, color, isFake}
 		}
 
+		//Basic Setup
+		this.state.playerList = this._setupPlayers(players);
+		this.state.turnList = this._createTurnList(this.state.playerList);
+		this.state.secret = this._generateSecret(SECRETS);
+
 		//Initialize Game
-		console.log('Setting up new game')
-		this._setupNewGame(players);
-		console.log('Displaying Secret')
-		this._displaySecret(this.state.currentSecret)
-		console.log('Starting turn progression')
-		setTimeout(() => this._nextTurn([...this.state.turnList]), 5000)
-		console.log('Turns finished')
-		// setTimeout(this._gameLoop, 5000) //For now nextturn, can put all logic in generator gameloop later or await/async
-		//setTimeoutfor5seconds to begin first turn
-		//at the end of each turn is an if statement
-		//---if not last turn settimeout for next turn
-		//---else settimeout for voting phase 1
+		console.log('Starting main game sequence')
+		this._start()
 	}
 
 	/**
@@ -101,9 +101,9 @@ class Game {
 		return players;
 	}
 
+	//Duplicate array of colors. Shuffle it
+	//Map through array of players, for each player, pop off the last color and add it to the player		
 	_setPlayerColors(players, colors) {
-		//Duplicate array of colors. Shuffle it
-		//Map through array of players, for each player, pop off the last color and add it to the player		
 		colors = shuffleArray([...colors])
 		players = players.map(player => {
 			const color = colors.pop();
@@ -118,27 +118,21 @@ class Game {
 
 	_createTurnList(players) {
 		const playerTurns = [...players, ...players];
-		// playerTurns = playerTurns.map(player => {
-
-		// });
 		return playerTurns;
 	}
 
 	//Select random secret from array of objects with category and secret
-	//Add secret to list of used secrets
+	//TODO: Add secret to list of used secrets
 	//TODO: if secret is already used, generate a different one
 	_generateSecret(secrets) {
 		return secrets[Math.floor(Math.random() * secrets.length)];
 	}
 
-	_setupNewGame(players) {
+	_setupPlayers(players) {
 		players = this._setFakePlayer(players);
 		players = this._setPlayerColors(players, COLORS);
 		players = this._setPlayerTurnOrder(players);
-		this.state.playerList = players;
-		this.state.turnList = this._createTurnList(players);
-		this.state.currentSecret = this._generateSecret(SECRETS);
-
+		return players
 	}
 
 	//Here I am manually accessing the sockets stored in the mutable playerList (instead of using a higher order
@@ -157,37 +151,59 @@ class Game {
 		});
 	}
 
-	_nextTurn(turns) {
+	_broadcastTurn(turn) {
+		this.state.playerList.map(player => {
+			const packet = {
+				type: 'new_turn',
+				payload: {
+					active: player.id === turn.player.id
+				}
+			}
+		})
+	}
+
+
+	_start() {
+		console.log('Sending Secret')
+		this._displaySecret(this.state.secret)
+		console.log('Starting first turn')
+		setTimeout(() => {this.nextTurn()}, 5000)
+	}
+
+	/**
+	 * This function will initially be called by the server after an interval following the execution of the
+	 * display secret phase. It will be subsequently triggered when received a message from the client of the
+	 * current turn (indicating the end of the turn). 
+	 * It will use the turn list generated at the instatiation of the game and be destructive. When the array
+	 * is depleted (all turns completed). It will trigger the first voting phase.
+	 * @param  {Array} Objects representing each turn (which player information)
+	 */
+	nextTurn() {
+		const turns = this.state.turnList;
 		if(!turns) {
 			return
 		}
 		else {
-			//1)Do action
+			//1) Do action
 			console.log('Broadcasting turn')
 			// this.broadcastTurn()
-			//2) Shift off first (completed) turn
-			console.log('Removing completed turn')
+			//2) Dispose of current turn
 			turns.shift()
 			console.log('Turns remaining: ', turns.length)
 			//3) Call nextTurn with remaining turns on a timeout
-			setTimeout((turns) => this._nextTurn(turns), 5000)
+			////(Instead the client will call this)
+			// setTimeout(() => this.nextTurn(), 5000)
 		}
 	}
 
-	_gameLoop() {
-		while(this.state.turnList.length) {
-			const turn = this.state.turnList.shift()
-			this._nextTurn(turn)
-			//wait 30 seconds
-		}
-		this._detectingVote()
-		//wait for votes
-		//tally votes 
-		//---ties = automatic win for fake 
-		// if(voteWinner !== fake || vote is a tie) -> go to gameover state and wait for restart
+	// 	this._detectingVote()
+	// 	//wait for votes
+	// 	//tally votes 
+	// 	//---ties = automatic win for fake 
+	// 	// if(voteWinner !== fake || vote is a tie) -> go to gameover state and wait for restart
 
 
-	}
+	// }
 
 	//Need to set up our own internal 
 

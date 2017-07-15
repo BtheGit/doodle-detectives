@@ -23,6 +23,9 @@ const gameroomSocketHandlers = (socket, client, session, gameSessionsMap) => {
 			else if(packet.type === 'vote_to_begin') {
 				session.addVoteToBegin(client);
 			}
+			else if(packet.type === 'next_turn') {
+				session.nextTurn(client)
+			}
 		}
 	});
 

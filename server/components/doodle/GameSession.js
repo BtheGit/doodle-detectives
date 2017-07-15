@@ -1,6 +1,7 @@
 const Game = require('./Game');
 
 //TODO: Track Room Players current scores, persist them after each game
+//TODO: Convert string constants to actual constants
 
 //This class will contain the logic for each game session (initiated by first player entering room, terminated
 //by last player exiting room)
@@ -17,7 +18,7 @@ class GameSession {
 		this.chatLog = [];
 		this.currentSessionStatus = 'isWaitingForPlayers';
 		this.game = null;
-		setTimeout(() => this.initGame(), 3000)
+		setTimeout(() => this.initGame(), 5000)
 		// this.usedSecrets = [] //figure out the best way to track variables like secrets/scores between games
 	}
 
@@ -57,19 +58,19 @@ class GameSession {
 	}
 
 	//perhaps I should pass this function down and allow game to use it (so game doesn't have to directly track sockets)
-	broadcastGameState() {
-		if(this.game) {
-			const gameState = this.game.retrieveState();
+	// broadcastGameState() {
+	// 	if(this.game) {
+	// 		const gameState = this.game.retrieveState();
 
-			const clients = [...this.clients] || []; //To avoid server crash if there are no clients
-			clients.forEach( client => {
-				client.send({
-					type: 'game_state_update',
-					gameState
-				})
-			})
-		}
-	}
+	// 		const clients = [...this.clients] || []; //To avoid server crash if there are no clients
+	// 		clients.forEach( client => {
+	// 			client.send({
+	// 				type: 'game_state_update',
+	// 				gameState
+	// 			})
+	// 		})
+	// 	}
+	// }
 
 	broadcastSessionState() {
 		const clients = [...this.clients] || []; //To avoid server crash if there are no clients
@@ -133,6 +134,11 @@ class GameSession {
 		//Games will not be recycled. Each game will be a new instance.
 		this.game = new Game(this, players)
 		this.broadcastSessionState();
+	}
+
+	nextTurn(client) {
+		//Check if client is client of current turn (if not, ignore completely, this is an erroneous message)
+		//Trigger Game.nextTurn()
 	}
 
 	//This will be the player list that the Game instance manipulates and broadcasts to. 

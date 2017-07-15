@@ -34,7 +34,6 @@ router.get('/room',
 //Not moving the logic for easier testing right now should move to controller later
 router.get('/room/static/*', authController.isLoggedIn, (req, res) => {
 	const route = req.params[0]
-	console.log(route)
 	res.sendFile(path.join(__dirname + '/../public/cra-doodle/static/' + route))
 })
 

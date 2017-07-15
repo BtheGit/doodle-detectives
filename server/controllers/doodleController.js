@@ -16,10 +16,6 @@ exports.lobby = (req, res) => {
 	res.render('./doodle/lobby')
 }
 
-// exports.newRoom = (req, res) => {
-// 	res.sendFile(path.join(__dirname + '/../public/cra-doodle/index.html'))
-// }
-
 //This is a hack to avoid the issue of improperly locating static resources because of 
 //different url structure for existing rooms
 exports.room = (req, res) => {
@@ -74,13 +70,11 @@ exports.joinRoom = (req, res, next) => {
 	//If not found redirect to lobby with flash 'Not found'
 	if(!gameSession) {
 		//TODO set Flash message for room not found
-		// res.redirect('/doodle/lobby')
 		next()
 	}
 	//If game already in session, redirect to lobby with flash 'Game already started. Can't join.''
 	if(gameSession.currentSessionStatus === 'isGameActive') {
 		//TODO: Flash 'Game already started. Can't join.'
-		// res.redirect('/doodle/lobby')
 		next()
 	}
 	//If full already redirect to lobby with flash 'Full'
@@ -92,6 +86,7 @@ exports.joinRoom = (req, res, next) => {
 //TODO!!
 exports.createClient = (req,res, next) => {
 	if(!req.gameSession){
+		console.log('No client created')
 		next()
 	}
 	else {
