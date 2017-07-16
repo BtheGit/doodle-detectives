@@ -74,6 +74,7 @@ class Game {
 				secret: ''
 			},
 			turnList: null, //{id, name, socket, color, isFake}
+			currentTurn: null
 		}
 
 		//Basic Setup
@@ -121,7 +122,6 @@ class Game {
 		return playerTurns;
 	}
 
-	//Select random secret from array of objects with category and secret
 	//TODO: Add secret to list of used secrets
 	//TODO: if secret is already used, generate a different one
 	_generateSecret(secrets) {
@@ -152,13 +152,17 @@ class Game {
 	}
 
 	_broadcastTurn(turn) {
+		console.log(turn)
 		this.state.playerList.map(player => {
 			const packet = {
-				type: 'new_turn',
+				type: 'next_turn',
 				payload: {
-					active: player.id === turn.player.id
+					active: player.id === turn.id,
+					color: turn.color
 				}
 			}
+			console.log('Sending turn', packet.payload)
+			player.socket.emit('packet', packet)
 		})
 	}
 
@@ -180,19 +184,12 @@ class Game {
 	 */
 	nextTurn() {
 		const turns = this.state.turnList;
-		if(!turns) {
+		if(!turns.length) {
 			return
 		}
 		else {
-			//1) Do action
-			console.log('Broadcasting turn')
-			// this.broadcastTurn()
-			//2) Dispose of current turn
-			turns.shift()
-			console.log('Turns remaining: ', turns.length)
-			//3) Call nextTurn with remaining turns on a timeout
-			////(Instead the client will call this)
-			// setTimeout(() => this.nextTurn(), 5000)
+			this.state.currentTurn = turns.shift();
+			this._broadcastTurn(this.state.currentTurn)
 		}
 	}
 

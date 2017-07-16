@@ -4,26 +4,24 @@ const gameroomSocketHandlers = (socket, client, session, gameSessionsMap) => {
 
 	//Handles typical client communications (chat/game)
 	socket.on('packet', (packet) => {
-		// console.log('Packet received: ', packet.type)
 		if(packet) {
 			if(packet.type === 'chat_message') {
-				//Store message to log, generate packet for broadcast, then broadcast it
 				session.addChatMessage(packet.payload)
 				const newPacket = generateChatPacket(packet.payload);
 				//Chat messages will be broadcast to everybody 
 				//(client will only see own message on return from server for easy sync)
-				client.send(newPacket); //send message back (could have two types of broadcast methods)
+				client.send(newPacket); //send message back (could have two types of broadcast methods instead)
 				client.broadcast(newPacket); //send to all other clients
 			}
 			else if(packet.type === 'path') {
 				//TODO: create an array of paths for restore (and separate them by turn for voting?)
-
 				client.broadcast(packet)
 			}
 			else if(packet.type === 'vote_to_begin') {
 				session.addVoteToBegin(client);
 			}
-			else if(packet.type === 'next_turn') {
+			else if(packet.type === 'end_of_turn') {
+				console.log('Client turn end received')
 				session.nextTurn(client)
 			}
 		}

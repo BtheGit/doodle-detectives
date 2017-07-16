@@ -136,9 +136,18 @@ class GameSession {
 		this.broadcastSessionState();
 	}
 
+	/**
+	 * This function will direct the active game to advance to the next turn. It's
+	 * primary function is to ensure that the command to advance comes from the currently
+	 * active player, to avoid cheating.
+	 * @param  {Object} client [Gives us access to the id of the active player] 
+	 */
 	nextTurn(client) {
-		//Check if client is client of current turn (if not, ignore completely, this is an erroneous message)
-		//Trigger Game.nextTurn()
+		const curTurn = this.game.retrieveState().currentTurn
+		if(curTurn.id === client.id) {
+			this.game.nextTurn()
+		}
+		
 	}
 
 	//This will be the player list that the Game instance manipulates and broadcasts to. 
