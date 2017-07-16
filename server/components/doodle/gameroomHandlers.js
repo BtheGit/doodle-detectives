@@ -21,8 +21,15 @@ const gameroomSocketHandlers = (socket, client, session, gameSessionsMap) => {
 				session.addVoteToBegin(client);
 			}
 			else if(packet.type === 'end_of_turn') {
-				console.log('Client turn end received')
 				session.nextTurn(client)
+			}
+			else if(packet.type === 'vote_for_fake') {
+				console.log('Vote for fake received')
+				const vote = {
+					id: client.id,
+					vote: packet.vote
+				}
+				session.addVoteForFake(vote)
 			}
 		}
 	});

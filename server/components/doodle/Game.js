@@ -75,7 +75,9 @@ class Game {
 			},
 			turnList: null, //{id, name, socket, color, isFake}
 			currentTurn: null
-		}
+		};
+		this.fakePlayer = null;
+		this.fakeVotes = new Set;
 
 		//Basic Setup
 		this.state.playerList = this._setupPlayers(players);
@@ -95,6 +97,7 @@ class Game {
 	 */
 	_setFakePlayer(players) {
 		const fake = players[Math.floor(Math.random() * players.length)]
+		this.fakePlayer = fake;
 		players = players.map(player => {
 			const isFake = player.id === fake.id ? true : false;
 			return Object.assign({}, player, {isFake})
@@ -152,7 +155,6 @@ class Game {
 	}
 
 	_broadcastTurn(turn) {
-		console.log(turn)
 		this.state.playerList.map(player => {
 			const packet = {
 				type: 'next_turn',
@@ -161,7 +163,6 @@ class Game {
 					color: turn.color
 				}
 			}
-			console.log('Sending turn', packet.payload)
 			player.socket.emit('packet', packet)
 		})
 	}
@@ -169,9 +170,67 @@ class Game {
 
 	_start() {
 		console.log('Sending Secret')
+		this.state.currentPhase = DISPLAYSECRET;
 		this._displaySecret(this.state.secret)
 		console.log('Starting first turn')
-		setTimeout(() => {this.nextTurn()}, 5000)
+		setTimeout(() => {
+			this.state.currentPhase = DRAWING;
+			this.nextTurn()
+		}, 1000)
+	}
+
+	_initiateFakeVoteSequence() {
+		console.log('Initiating Fake Vote Phase')
+		this.state.currentPhase = FAKEVOTE;
+		const players = this.state.playerList.map(player => player.color)
+		this.state.playerList.map(player => {
+			const packet = {
+				type: 'initiate_fake_vote',
+				players
+			}
+			player.socket.emit('packet', packet)
+		})	
+	}
+
+	/**
+	 * This function will find vote winner (or tie) from the Set this.fakeVotes.
+	 * First a hashmap will count votes, which is converted to an array for sorting.
+	 * @return {[type]} [description]
+	 */
+	_tallyFakeVotes() {
+		console.log('Tallying Fake Votes')		
+		let tally = {};
+		let tallyArr = [];
+		//We have to do this because at the moment the fakePlayer is stored before its color is assigned
+		const fakePlayer = this.state.playerList.filter(player => player.id === this.fakePlayer.id)[0];
+		const fakeColor = fakePlayer.color;
+		let isTie = false;
+		let fakeWins = false;
+		this.fakeVotes.forEach(player => {
+			tally[player.vote] = tally.hasOwnProperty(player.vote) ? tally[player.vote] + 1 : 1;
+		})
+		for(let vote in tally) {
+			tallyArr.push({
+				color: vote,
+				count: tally[vote]
+			});
+		};
+		tallyArr.sort((a,b) => a.count - b.count);
+		if(tallyArr.length > 1) {
+			if(tallyArr[0].count === tallyArr[1].count) {
+				isTie = true;
+				fakeWins = true;
+			}
+		}
+		if(tallyArr[0].color !== fakeColor) {
+			fakeWins = true;
+		}
+		//TODO set variables to results, determine whether to initiatiate fake guessing phase or display final results
+	}
+
+
+	retrieveState() {
+		return this.state;
 	}
 
 	/**
@@ -184,12 +243,21 @@ class Game {
 	 */
 	nextTurn() {
 		const turns = this.state.turnList;
-		if(!turns.length) {
-			return
+		if (!turns.length) {
+			this._initiateFakeVoteSequence()
 		}
 		else {
 			this.state.currentTurn = turns.shift();
 			this._broadcastTurn(this.state.currentTurn)
+		}
+	}
+
+	addVoteForFake(vote) {
+		//TODO Check if set already has client ID (double check for no double voting)
+		this.fakeVotes.add(vote)
+		//Check if all votes are received and tally
+		if(this.fakeVotes.size === this.state.playerList.length) {
+			this._tallyFakeVotes()
 		}
 	}
 
@@ -204,21 +272,9 @@ class Game {
 
 	//Need to set up our own internal 
 
-	//Loop through array of turns
-			// iterate through turn array(
-			// 	check if last turn
-			// 	(if last turn, at end of turn start voting phase)
-			// 	at the beginning of each turn -> broadcast turn state (who is drawing)
-			// 	start timer for turn
-			// 	receive and broadcast paths from player only (also client-side prohibit sending when not your turn) to other players
-
-			// 	(LATER if player disconnects, start 60sec pause loop. If player returns before, resume, otherwise quit)
-			// 	(LATER blackmark on player for disconnect, enough = flag/ban)
-			// )
-
-	retrieveState() {
-		return this.state;
-	}
+	// 	(LATER if player disconnects, start 60sec pause loop. If player returns before, resume, otherwise quit)
+	// 	(LATER blackmark on player for disconnect, enough = flag/ban)
+	// )
 
 
 }

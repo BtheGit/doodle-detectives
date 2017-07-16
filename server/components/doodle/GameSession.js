@@ -41,6 +41,14 @@ class GameSession {
 		this._updateVoteStatus();
 	}
 
+	/**
+	 * Takes Fake Vote from socket handler and passes it to Game handler
+	 * @param {Object} vote [contains client id and vote (color)]
+	 */
+	addVoteForFake(vote) {
+		this.game.addVoteForFake(vote)
+	}
+
 	//!!!GAME Will initialize here when all votes have been collected.
 	_updateVoteStatus() {
 		if(this.currentSessionStatus !== 'isGameActive'){
