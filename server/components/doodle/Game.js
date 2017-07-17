@@ -201,11 +201,10 @@ class Game {
 		console.log('Tallying Fake Votes')		
 		let tally = {};
 		let tallyArr = [];
-		//We have to do this because at the moment the fakePlayer is stored before its color is assigned
-		const fakePlayer = this.state.playerList.filter(player => player.id === this.fakePlayer.id)[0];
-		const fakeColor = fakePlayer.color;
 		let isTie = false;
 		let fakeWins = false;
+		//We have to do this because at the moment the fakePlayer is stored before its color is assigned
+		this.fakePlayer = this.state.playerList.filter(player => player.id === this.fakePlayer.id)[0];
 		this.fakeVotes.forEach(player => {
 			tally[player.vote] = tally.hasOwnProperty(player.vote) ? tally[player.vote] + 1 : 1;
 		})
@@ -216,13 +215,13 @@ class Game {
 			});
 		};
 		tallyArr.sort((a,b) => a.count - b.count);
-		if(tallyArr.length > 1) {
+		if(tallyArr.length > 1) { //This check shouldn't be needed, but I'm testing with one player right now
 			if(tallyArr[0].count === tallyArr[1].count) {
 				isTie = true;
 				fakeWins = true;
 			}
 		}
-		if(tallyArr[0].color !== fakeColor) {
+		if(tallyArr[0].color !== this.fakePlayer.color) {
 			fakeWins = true;
 		}
 		//TODO set variables to results, determine whether to initiatiate fake guessing phase or display final results
@@ -241,6 +240,7 @@ class Game {
 	 * is depleted (all turns completed). It will trigger the first voting phase.
 	 * @param  {Array} Objects representing each turn (which player information)
 	 */
+	//TODO: This fired multiple times, why?
 	nextTurn() {
 		const turns = this.state.turnList;
 		if (!turns.length) {

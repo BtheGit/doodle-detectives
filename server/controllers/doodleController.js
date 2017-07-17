@@ -29,23 +29,23 @@ exports.room = (req, res) => {
 
 
 //############ LOBBY HELPERS 
-exports.connectLobby =(req,res,next) => {
-	//TODO:
+exports.connectLobby = (req,res,next) => {
+	//TODO: Move outside of route controller to avoid firing multiple times
 	//The idea is to have a list of active users
 	//And to have a chat window
-	req.io.of('/lobby').on('connection', (socket) => {
-		console.log('Socket connection made:', socket.id)
-		lobbyUsers.set(req.user.id, req.user.name)
+	// req.io.of('/lobby').on('connection', (socket) => {
+	// 	console.log('Socket connection made:', socket.id)
+	// 	lobbyUsers.set(req.user.id, req.user.name)
 
-		socket.on('reqUpdate', () => {
-			const rooms = generateSessionsList(gameSessionsMap)
-			socket.emit('getUpdate', rooms)
-		})
+	// 	socket.on('reqUpdate', () => {
+	// 		const rooms = generateSessionsList(gameSessionsMap)
+	// 		socket.emit('getUpdate', rooms)
+	// 	})
 
-		socket.on('disconnect', () => {
-			lobbyUsers.delete(req.user.id)
-		})
-	})
+	// 	socket.on('disconnect', () => {
+	// 		lobbyUsers.delete(req.user.id)
+	// 	})
+	// })
 	next()
 }
 

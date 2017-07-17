@@ -9,7 +9,6 @@ const path = require('path')
 //USER/AUTH ROUTES
 router.get('/lobby', 
 	authController.isLoggedIn, 
-	controller.connectLobby, 
 	controller.lobby
 );
 

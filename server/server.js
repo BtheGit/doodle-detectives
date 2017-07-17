@@ -38,7 +38,7 @@ const sessionMiddleware = session({
 
 const app = express();
 app.disable('x-powered-by');
-// app.use(morgan('dev'));
+app.use(morgan('dev'));
 
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'ejs');
@@ -93,6 +93,7 @@ const ioSessionMiddleWare = {
 		store: sessionStore,
 }
 io.use(passportSocketIo.authorize(ioSessionMiddleWare))
+require('./components/lobby.js')(io)
 require('./components/doodle')(io) //Doodle Game Entry point
 
 //Make sockets available to controllers to offload game logic
