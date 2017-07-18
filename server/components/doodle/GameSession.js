@@ -65,21 +65,6 @@ class GameSession {
 		}
 	}
 
-	//perhaps I should pass this function down and allow game to use it (so game doesn't have to directly track sockets)
-	// broadcastGameState() {
-	// 	if(this.game) {
-	// 		const gameState = this.game.retrieveState();
-
-	// 		const clients = [...this.clients] || []; //To avoid server crash if there are no clients
-	// 		clients.forEach( client => {
-	// 			client.send({
-	// 				type: 'game_state_update',
-	// 				gameState
-	// 			})
-	// 		})
-	// 	}
-	// }
-
 	broadcastSessionState() {
 		const clients = [...this.clients] || []; //To avoid server crash if there are no clients
 

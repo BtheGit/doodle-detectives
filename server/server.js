@@ -1,4 +1,5 @@
 require('dotenv').config({path: __dirname + '/.env'});
+
 const express 				= require('express'),
 			bodyParser 			= require('body-parser'),
 			cookieParser 		= require('cookie-parser'),
@@ -63,7 +64,6 @@ app.use((req, res, next) => {
   next();
 });
 
-
 // promisify some callback based APIs
 app.use((req, res, next) => {
   req.login = promisify(req.login, req);
@@ -80,9 +80,6 @@ const server = app.listen(port, () => {
 
 //############## CUSTOM SESSIONS FOR SOCKET.IO GAME ###################
 
-// //TODO: Create Map of Game Sessions
-
-
 //Try and move this to another file entirely perhaps
 const io = require('socket.io')(server)
 const passportSocketIo = require('passport.socketio')
@@ -95,11 +92,5 @@ const ioSessionMiddleWare = {
 io.use(passportSocketIo.authorize(ioSessionMiddleWare))
 require('./components/lobby.js')(io)
 require('./components/doodle')(io) //Doodle Game Entry point
-
-//Make sockets available to controllers to offload game logic
-app.use((req,res,next) => {
-	req.io = io;
-	next();
-})
 
 app.use('/', require('./routes'))

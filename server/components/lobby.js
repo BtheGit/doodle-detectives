@@ -5,7 +5,6 @@ module.exports = lobby;
 
 function lobby(io) {
 	io.of('/lobby').on('connection', (socket) => {
-		// console.log(socket.request.user.id, socket.request.user.name)
 		console.log('Socket connection made:', socket.id)
 		lobbyUsers.set(socket.request.user.id, socket.request.user.name)
 

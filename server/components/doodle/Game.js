@@ -85,9 +85,9 @@ class Game {
 		this.state.secret = this._generateSecret(SECRETS);
 
 		//Initialize Game
-		console.log('Starting main game sequence')
-		this._start()
-	}
+		console.log('Starting main game sequence');
+		this._start();
+	};
 
 	/**
 	 * Generate a random fake artist for the round from array of players
@@ -96,47 +96,60 @@ class Game {
 	 * @return {Array} [players array with one player isFake set to true, the rest to false]
 	 */
 	_setFakePlayer(players) {
-		const fake = players[Math.floor(Math.random() * players.length)]
+		const fake = players[Math.floor(Math.random() * players.length)];
 		this.fakePlayer = fake;
 		players = players.map(player => {
 			const isFake = player.id === fake.id ? true : false;
-			return Object.assign({}, player, {isFake})
-		})
+			return Object.assign({}, player, {isFake});
+		});
 		return players;
-	}
+	};
 
 	//Duplicate array of colors. Shuffle it
 	//Map through array of players, for each player, pop off the last color and add it to the player		
 	_setPlayerColors(players, colors) {
-		colors = shuffleArray([...colors])
+		colors = shuffleArray([...colors]);
 		players = players.map(player => {
 			const color = colors.pop();
-			return Object.assign({}, player, {color})
-		})
+			return Object.assign({}, player, {color});
+		});
 		return players;
-	}
+	};
 
 	_setPlayerTurnOrder(players) {
 		return shuffleArray(players);
-	}
+	};
 
 	_createTurnList(players) {
 		const playerTurns = [...players, ...players];
 		return playerTurns;
-	}
+	};
 
 	//TODO: Add secret to list of used secrets
 	//TODO: if secret is already used, generate a different one
 	_generateSecret(secrets) {
 		return secrets[Math.floor(Math.random() * secrets.length)];
-	}
+	};
 
 	_setupPlayers(players) {
 		players = this._setFakePlayer(players);
 		players = this._setPlayerColors(players, COLORS);
 		players = this._setPlayerTurnOrder(players);
-		return players
-	}
+		return players;
+	};
+
+	_start() {
+		console.log('Sending Secret');
+		this.state.currentPhase = DISPLAYSECRET;
+		this._displaySecret(this.state.secret);
+		console.log('Starting first turn');
+		setTimeout(() => {
+			this.state.currentPhase = DRAWING;
+			this.nextTurn()
+		}, 1000);
+	};
+
+	//############ EMITTERS ###############
 
 	//Here I am manually accessing the sockets stored in the mutable playerList (instead of using a higher order
 	//function passed from the gameSession) to emit the secret to all players except the fake who only receives
@@ -149,10 +162,10 @@ class Game {
 					category: secret.category,
 					secret: `${player.isFake ? 'XXX' : secret.secret}`
 				}
-			}
+			};
 			player.socket.emit('packet', packet)
 		});
-	}
+	};
 
 	_broadcastTurn(turn) {
 		this.state.playerList.map(player => {
@@ -162,35 +175,44 @@ class Game {
 					active: player.id === turn.id,
 					color: turn.color
 				}
-			}
-			player.socket.emit('packet', packet)
-		})
-	}
-
-
-	_start() {
-		console.log('Sending Secret')
-		this.state.currentPhase = DISPLAYSECRET;
-		this._displaySecret(this.state.secret)
-		console.log('Starting first turn')
-		setTimeout(() => {
-			this.state.currentPhase = DRAWING;
-			this.nextTurn()
-		}, 1000)
-	}
+			};
+			player.socket.emit('packet', packet);
+		});
+	};
 
 	_initiateFakeVoteSequence() {
-		console.log('Initiating Fake Vote Phase')
+		console.log('Initiating Fake Vote Phase');
 		this.state.currentPhase = FAKEVOTE;
-		const players = this.state.playerList.map(player => player.color)
+		const players = this.state.playerList.map(player => player.color);
 		this.state.playerList.map(player => {
 			const packet = {
 				type: 'initiate_fake_vote',
 				players
-			}
-			player.socket.emit('packet', packet)
-		})	
-	}
+			};
+			player.socket.emit('packet', packet);
+		});
+	};
+
+	_emitFakeLosesEndGame() {
+		console.log('Emitting Fake Artist Loses Scenario');
+		this.state.currentPhase = GAMEOVER;
+		//Process array of players and their colors and whether they are the fake
+		const players = this.state.playerList.map(player => {
+			return {
+				name: player.name,
+				color: player.color,
+				isFake: player.isFake
+			};
+		});
+		//Send array
+		this.state.playerList.map(player => {
+			const packet = {
+				type: 'fake_not_found',
+				players
+			};
+			player.socket.emit('packet', packet);
+		});
+	};
 
 	/**
 	 * This function will find vote winner (or tie) from the Set this.fakeVotes.
@@ -224,7 +246,13 @@ class Game {
 		if(tallyArr[0].color !== this.fakePlayer.color) {
 			fakeWins = true;
 		}
+		console.log('Fake wins:', fakeWins)
 		//TODO set variables to results, determine whether to initiatiate fake guessing phase or display final results
+		if(!fakeWins) {
+			//No further rounds necessary. Everyone but the fake wins and gets points. All players and their colors 
+			//be revealed.
+			this._emitFakeLosesEndGame()
+		}
 	}
 
 
@@ -240,7 +268,6 @@ class Game {
 	 * is depleted (all turns completed). It will trigger the first voting phase.
 	 * @param  {Array} Objects representing each turn (which player information)
 	 */
-	//TODO: This fired multiple times, why?
 	nextTurn() {
 		const turns = this.state.turnList;
 		if (!turns.length) {

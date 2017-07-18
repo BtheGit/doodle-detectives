@@ -4,7 +4,6 @@ const passport 																					= require('passport'),
 			User 																							= mongoose.model('User'),
 			promisify 																				= require('es6-promisify'),
 			{ gameSessionsMap, lobbyUsers, activePlayersMap } = require('../TEMPdb/db.js'),
-			{ generateSessionsList, parseMapForDB } 					= require('../components/lobbyHelpers'),
 			{ generateRandomColor, generateRandomId } 				= require('../components/doodle/gameroomHelpers'),
 			GameSession 																			= require('../components/doodle/GameSession'),
 			GameClient 																				= require('../components/doodle/GameClient')
@@ -27,28 +26,6 @@ exports.room = (req, res) => {
 	}
 }
 
-
-//############ LOBBY HELPERS 
-exports.connectLobby = (req,res,next) => {
-	//TODO: Move outside of route controller to avoid firing multiple times
-	//The idea is to have a list of active users
-	//And to have a chat window
-	// req.io.of('/lobby').on('connection', (socket) => {
-	// 	console.log('Socket connection made:', socket.id)
-	// 	lobbyUsers.set(req.user.id, req.user.name)
-
-	// 	socket.on('reqUpdate', () => {
-	// 		const rooms = generateSessionsList(gameSessionsMap)
-	// 		socket.emit('getUpdate', rooms)
-	// 	})
-
-	// 	socket.on('disconnect', () => {
-	// 		lobbyUsers.delete(req.user.id)
-	// 	})
-	// })
-	next()
-}
-
 //############### ROOM MIDDLEWARE
 
 //An empty gameSession will be created and added to DB of existing sessions, the session is passed along the 
@@ -59,6 +36,7 @@ exports.createRoom = (req, res, next) => {
 	const sessionId = new Date().valueOf() + generateRandomId()
 	const gameSession = createGameSession(sessionId);
 	req.gameSession = gameSession;
+	console.log('GAME SESSION CREATED', req.gameSession)
 	next();
 }
 
@@ -77,7 +55,8 @@ exports.joinRoom = (req, res, next) => {
 		//TODO: Flash 'Game already started. Can't join.'
 		next()
 	}
-	//If full already redirect to lobby with flash 'Full'
+	//TODO If full already redirect to lobby with flash 'Full'
+	
 	//Attach gameSessionto req
 	req.gameSession = gameSession
 	next();
