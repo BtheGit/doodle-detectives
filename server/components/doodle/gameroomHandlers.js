@@ -31,6 +31,15 @@ const gameroomSocketHandlers = (socket, client, session, gameSessionsMap) => {
 				}
 				session.addVoteForFake(vote)
 			}
+			else if (packet.type === 'fake_guess') {
+				//We want to send this guess out for approval (to allow for creative license in answering rather than strict
+				//syntax matching)
+				session.receiveFakeGuess(packet.guess)
+			}
+			else if (packet.type === 'guess_approval_vote') {
+				console.log('Received vote to approve guess of ', packet.vote)
+				session.receiveVoteToApproveGuess(client.id, packet.vote)
+			}
 		}
 	});
 

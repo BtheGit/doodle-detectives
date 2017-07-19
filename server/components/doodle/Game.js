@@ -74,10 +74,14 @@ class Game {
 				secret: ''
 			},
 			turnList: null, //{id, name, socket, color, isFake}
-			currentTurn: null
+			currentTurn: null,
+			fakeGuess: ''
 		};
 		this.fakePlayer = null;
 		this.fakeVotes = new Set;
+		this.votesToApprove = new Map;
+		this.isFakeWinner = false;
+		this.isFakeFound = false;
 
 		//Basic Setup
 		this.state.playerList = this._setupPlayers(players);
@@ -159,8 +163,11 @@ class Game {
 			const packet = {
 				type: 'display_secret_phase',
 				payload: {
-					category: secret.category,
-					secret: `${player.isFake ? 'XXX' : secret.secret}`
+					secret: {
+						category: secret.category,
+						secret: `${player.isFake ? 'XXX' : secret.secret}`
+					},
+					fakeIsMe: player.isFake
 				}
 			};
 			player.socket.emit('packet', packet)
@@ -193,10 +200,9 @@ class Game {
 		});
 	};
 
-	_emitFakeLosesEndGame() {
-		console.log('Emitting Fake Artist Loses Scenario');
+	_emitFakeNotFoundEndGame() {
+		console.log('Emitting Fake Artist Is Not Found and Wins Scenario');
 		this.state.currentPhase = GAMEOVER;
-		//Process array of players and their colors and whether they are the fake
 		const players = this.state.playerList.map(player => {
 			return {
 				name: player.name,
@@ -204,7 +210,7 @@ class Game {
 				isFake: player.isFake
 			};
 		});
-		//Send array
+
 		this.state.playerList.map(player => {
 			const packet = {
 				type: 'fake_not_found',
@@ -213,6 +219,58 @@ class Game {
 			player.socket.emit('packet', packet);
 		});
 	};
+
+	_emitGameOverResults() {
+		console.log('Game Over. Fake is winner:', this.isFakeWinner);
+		this.state.currentPhase = GAMEOVER;
+		const players = this.state.playerList.map(player => {
+			return {
+				name: player.name,
+				color: player.color,
+				isFake: player.isFake
+			};
+		});
+
+		this.state.playerList.map(player => {
+			const packet = {
+				type: 'game_over',
+				payload: {
+					players,
+					fakeWins: this.isFakeWinner,
+					fakeFound: this.isFakeFound
+				}
+			};
+			player.socket.emit('packet', packet);
+		});
+	};
+
+	_emitFakeFoundPromptForGuess() {
+		this.state.playerList.map(player => {
+			const packet = {
+				type: 'prompt_fake_for_guess'
+			};
+			player.socket.emit('packet', packet);
+		});
+	}
+
+	_emitFakeGuessForApproval(guess) {
+		this.state.playerList.map(player => {
+			const packet = {
+				type: 'get_approval_for_fake_guess',
+				guess
+			};
+			player.socket.emit('packet', packet);
+		});
+	}
+
+	// _emitFinalResultsEndGame() {
+	// 	this.state.playerList.map(player => {
+	// 		const packet = {
+	// 			type: 'final_results'
+	// 		};
+	// 		player.socket.emit('packet', packet);
+	// 	});
+	// }
 
 	/**
 	 * This function will find vote winner (or tie) from the Set this.fakeVotes.
@@ -224,7 +282,7 @@ class Game {
 		let tally = {};
 		let tallyArr = [];
 		let isTie = false;
-		let fakeWins = false;
+		let fakeNotFound = false;
 		//We have to do this because at the moment the fakePlayer is stored before its color is assigned
 		this.fakePlayer = this.state.playerList.filter(player => player.id === this.fakePlayer.id)[0];
 		this.fakeVotes.forEach(player => {
@@ -240,21 +298,36 @@ class Game {
 		if(tallyArr.length > 1) { //This check shouldn't be needed, but I'm testing with one player right now
 			if(tallyArr[0].count === tallyArr[1].count) {
 				isTie = true;
-				fakeWins = true;
+				fakeNotFound = true;
 			}
 		}
 		if(tallyArr[0].color !== this.fakePlayer.color) {
-			fakeWins = true;
+			fakeNotFound = true;
 		}
-		console.log('Fake wins:', fakeWins)
+		console.log('Fake wins:', fakeNotFound)
 		//TODO set variables to results, determine whether to initiatiate fake guessing phase or display final results
-		if(!fakeWins) {
-			//No further rounds necessary. Everyone but the fake wins and gets points. All players and their colors 
-			//be revealed.
-			this._emitFakeLosesEndGame()
+		if(fakeNotFound) {
+			//No further rounds necessary. The fake wins outright because he wasn't found 
+			//and gets points. All players and their colors be revealed.
+			this.isFakeWinner = true;
+			this._emitFakeNotFoundEndGame();
+		}
+		else {
+			this.isFakeFound = true;
+			this._emitFakeFoundPromptForGuess();
 		}
 	}
 
+	_tallyApprovalVotes() {
+		//If there are a majority of votes approving (ties lose) the guess than the fake steals the win
+		const totalVotes = this.votesToApprove.size;
+		let yesVotes = 0;
+		this.votesToApprove.forEach(value => {
+			if (value === 'yes') yesVotes++;
+		})
+		this.isFakeWinner = (yesVotes > totalVotes / 2) ? true : false;
+		this._emitGameOverResults();
+	}
 
 	retrieveState() {
 		return this.state;
@@ -286,6 +359,27 @@ class Game {
 		if(this.fakeVotes.size === this.state.playerList.length) {
 			this._tallyFakeVotes()
 		}
+	}
+
+	addVoteToApproveGuess(client, vote) {
+		console.log('Adding vote to approve guess', client, vote)
+
+		//Check to make sure the client isn't voting more than once
+		if(!this.votesToApprove.has(client)) {
+			this.votesToApprove.set(client, vote)
+		}
+		//Check if we have a number of votes equal to players - 1(fake) 
+		//NOTE: We could verify the IDs as well, but for the sake of expediency (this is a guess 
+		//verification step only)
+		if(this.votesToApprove.size >= (this.state.playerList.length - 1)) {
+			this._tallyApprovalVotes();
+		}
+	}
+
+	receiveFakeGuess(guess) {
+		console.log('Fake guess received: ', guess)
+		this.state.fakeGuess = guess;
+		this._emitFakeGuessForApproval(guess);
 	}
 
 	// 	this._detectingVote()

@@ -33,12 +33,12 @@ class GameSession {
 
 	addVoteToBegin(client) {
 		this.votedToBegin.add(client)
-		this._updateVoteStatus();
+		this._updateVoteToBeginStatus();
 	}
 
 	removeVoteToBegin(client) {
 		this.votedToBegin.delete(client);
-		this._updateVoteStatus();
+		this._updateVoteToBeginStatus();
 	}
 
 	/**
@@ -49,8 +49,12 @@ class GameSession {
 		this.game.addVoteForFake(vote)
 	}
 
+	receiveVoteToApproveGuess(client, vote) {
+		this.game.addVoteToApproveGuess(client, vote)
+	}
+
 	//!!!GAME Will initialize here when all votes have been collected.
-	_updateVoteStatus() {
+	_updateVoteToBeginStatus() {
 		if(this.currentSessionStatus !== 'isGameActive'){
 			// if(this.clients.size === this.votedToBegin.length) {
 				//should be comparing elements not just size here in case one player goes and another comes
@@ -116,7 +120,7 @@ class GameSession {
 		this._checkPlayerQuotas()
 	}
 
-	//This is triggered in _updateVoteStatus() when all votes have been collected
+	//This is triggered in _updateVoteToBeginStatus() when all votes have been collected
 	initGame() {
 		//Clear votes for next game //disabled for testing
 		// this.votedToBegin.clear();
@@ -140,7 +144,10 @@ class GameSession {
 		if(curTurn.id === client.id) {
 			this.game.nextTurn()
 		}
-		
+	}
+
+	receiveFakeGuess(guess) {
+		this.game.receiveFakeGuess(guess);
 	}
 
 	//This will be the player list that the Game instance manipulates and broadcasts to. 
