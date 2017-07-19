@@ -191,11 +191,11 @@ class Game {
 		console.log('Initiating Fake Vote Phase');
 		this.state.currentPhase = FAKEVOTE;
 		const players = this.state.playerList.map(player => player.color);
+		const packet = {
+			type: 'initiate_fake_vote',
+			players
+		};
 		this.state.playerList.map(player => {
-			const packet = {
-				type: 'initiate_fake_vote',
-				players
-			};
 			player.socket.emit('packet', packet);
 		});
 	};
@@ -211,11 +211,11 @@ class Game {
 			};
 		});
 
+		const packet = {
+			type: 'fake_not_found',
+			players
+		};
 		this.state.playerList.map(player => {
-			const packet = {
-				type: 'fake_not_found',
-				players
-			};
 			player.socket.emit('packet', packet);
 		});
 	};
@@ -231,34 +231,34 @@ class Game {
 			};
 		});
 
+		const packet = {
+			type: 'game_over',
+			payload: {
+				players,
+				isFakeWinner: this.isFakeWinner,
+				isFakeFound: this.isFakeFound
+			}
+		};
 		this.state.playerList.map(player => {
-			const packet = {
-				type: 'game_over',
-				payload: {
-					players,
-					fakeWins: this.isFakeWinner,
-					fakeFound: this.isFakeFound
-				}
-			};
 			player.socket.emit('packet', packet);
 		});
 	};
 
 	_emitFakeFoundPromptForGuess() {
+		const packet = {
+			type: 'prompt_fake_for_guess'
+		};
 		this.state.playerList.map(player => {
-			const packet = {
-				type: 'prompt_fake_for_guess'
-			};
 			player.socket.emit('packet', packet);
 		});
 	}
 
-	_emitFakeGuessForApproval(guess) {
+	_emitFakeGuessForApproval(guess) {	
+		const packet = {
+			type: 'get_approval_for_fake_guess',
+			guess
+		};
 		this.state.playerList.map(player => {
-			const packet = {
-				type: 'get_approval_for_fake_guess',
-				guess
-			};
 			player.socket.emit('packet', packet);
 		});
 	}
@@ -319,6 +319,7 @@ class Game {
 	}
 
 	_tallyApprovalVotes() {
+		console.log('Tallying Approval Votes')
 		//If there are a majority of votes approving (ties lose) the guess than the fake steals the win
 		const totalVotes = this.votesToApprove.size;
 		let yesVotes = 0;
@@ -326,7 +327,12 @@ class Game {
 			if (value === 'yes') yesVotes++;
 		})
 		this.isFakeWinner = (yesVotes > totalVotes / 2) ? true : false;
+		this._concludeGame();
+	}
+
+	_concludeGame() {
 		this._emitGameOverResults();
+		this.session.resetSessionStatusAfterGame();
 	}
 
 	retrieveState() {

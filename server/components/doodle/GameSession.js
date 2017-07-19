@@ -10,13 +10,18 @@ const Game = require('./Game');
 
 const MINIMUM_PLAYERS_FOR_GAME = 5;
 
+//Session State Toggles
+const GAMEACTIVE        = 'GAMEACTIVE',
+      WAITINGTOSTART    = 'WAITINGTOSTART',
+      WAITINGFORPLAYERS = 'WAITINGFORPLAYERS';
+
 class GameSession {
 	constructor(id) {
 		this.id = id;
 		this.clients = new Set;
 		this.votedToBegin = new Set;
 		this.chatLog = [];
-		this.currentSessionStatus = 'isWaitingForPlayers';
+		this.currentSessionStatus = WAITINGFORPLAYERS;
 		this.game = null;
 		setTimeout(() => this.initGame(), 5000)
 		// this.usedSecrets = [] //figure out the best way to track variables like secrets/scores between games
@@ -55,16 +60,16 @@ class GameSession {
 
 	//!!!GAME Will initialize here when all votes have been collected.
 	_updateVoteToBeginStatus() {
-		if(this.currentSessionStatus !== 'isGameActive'){
+		if(this.currentSessionStatus !== GAMEACTIVE){
 			// if(this.clients.size === this.votedToBegin.length) {
 				//should be comparing elements not just size here in case one player goes and another comes
 				//lodash _.isEquals works
 			if(this.clients.size === this.votedToBegin.size) { 
-				this.currentSessionStatus = 'isWaitingToStart';
+				this.currentSessionStatus = WAITINGTOSTART;
 				this.initGame();
 			}
 			else {
-				this.currentSessionStatus = 'isWaitingForPlayers';
+				this.currentSessionStatus = WAITINGFORPLAYERS;
 			}
 		}
 	}
@@ -125,7 +130,7 @@ class GameSession {
 		//Clear votes for next game //disabled for testing
 		// this.votedToBegin.clear();
 		//This will flag the client to render the status bar differently
-		this.currentSessionStatus = 'isGameActive';
+		this.currentSessionStatus = GAMEACTIVE;
 		//Create a copy of players for the game to manipulate without affecting session members
 		const players = this._createPlayerList();
 		//Games will not be recycled. Each game will be a new instance.
@@ -150,6 +155,13 @@ class GameSession {
 		this.game.receiveFakeGuess(guess);
 	}
 
+
+	resetSessionStatusAfterGame() {
+		this.currentSessionStatus = WAITINGTOSTART;
+		this._checkPlayerQuotas();
+		this.broadcastSessionState();
+	}
+
 	//This will be the player list that the Game instance manipulates and broadcasts to. 
 	//Passing a copy will allow us to mutate it at will for the duration of the game and
 	//reset for the next game without consequence
@@ -168,12 +180,12 @@ class GameSession {
 	}
 
 	_checkPlayerQuotas() {
-		if(this.currentSessionStatus !== 'isGameActive') {
+		if(this.currentSessionStatus !== GAMEACTIVE) {
 			if(this.clients.size >= MINIMUM_PLAYERS_FOR_GAME) {
-				this.currentSessionStatus = 'isWaitingToStart';
+				this.currentSessionStatus = WAITINGTOSTART;
 			}	
 			else {
-				this.currentSessionStatus = 'isWaitingForPlayers';
+				this.currentSessionStatus = WAITINGFORPLAYERS;
 			}
 		}
 	}
