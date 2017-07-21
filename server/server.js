@@ -1,4 +1,4 @@
-require('dotenv').config({path: __dirname + '/.env'});
+require('dotenv').config({path: __dirname + './../.env'});
 //DATABASE=mongodb://fcc-admin:fcc-password@ds139242.mlab.com:39242/fcc_projects
 
 

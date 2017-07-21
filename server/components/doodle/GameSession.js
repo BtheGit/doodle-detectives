@@ -115,6 +115,15 @@ class GameSession {
 		})			
 	}
 
+	_emitGameWillStartAlert() {
+		const clients = [...this.clients] || []; 
+		clients.forEach( client => {
+			client.send({
+				type: 'game_will_start'
+			})
+		})	
+	}
+
 	//TODO: make sure a maximum of 8 can join room
 	join(client) {
 		if(client.session) {
@@ -141,6 +150,9 @@ class GameSession {
 
 	//This is triggered in _updateVoteToBeginStatus() when all votes have been collected
 	initGame() {
+		// These paths are doodles in between game sessions
+		this.clearPaths();
+		this._emitGameWillStartAlert(); 
 		//Clear votes for next game //disabled for testing
 		// this.votedToBegin.clear();
 		//This will flag the client to render the status bar differently
