@@ -8,7 +8,7 @@ const Game = require('./Game');
 //Each time a new game is initiated a Game instance will be created
 //Any tracking of state between games should be done at this level or higher
 
-const MINIMUM_PLAYERS_FOR_GAME = 5;
+const MINIMUM_PLAYERS_FOR_GAME = 2;
 
 //Session State Toggles
 const GAMEACTIVE        = 'GAMEACTIVE',
@@ -24,7 +24,7 @@ class GameSession {
 		this.paths = [];
 		this.currentSessionStatus = WAITINGFORPLAYERS;
 		this.game = null;
-		// setTimeout(() => this.initGame(), 5000)
+		// setTimeout(() => this.initGame(), 15000)
 		// this.usedSecrets = [] //figure out the best way to track variables like secrets/scores between games
 	}
 
@@ -183,6 +183,7 @@ class GameSession {
 
 
 	resetSessionStatusAfterGame() {
+		this.votedToBegin = new Set;
 		this.currentSessionStatus = WAITINGTOSTART;
 		this._checkPlayerQuotas();
 		this.broadcastSessionState();
