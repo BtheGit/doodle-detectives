@@ -14,7 +14,7 @@ const gameroomSocketHandlers = (socket, client, session, gameSessionsMap) => {
 				client.broadcast(newPacket); //send to all other clients
 			}
 			else if(packet.type === 'path') {
-				//TODO: create an array of paths for restore (and separate them by turn for voting?)
+				session.addPath(packet.payload);
 				client.broadcast(packet)
 			}
 			else if(packet.type === 'vote_to_begin') {
@@ -53,7 +53,6 @@ const gameroomSocketHandlers = (socket, client, session, gameSessionsMap) => {
 			//Update clients when a player disconnects
 			//Or terminate session altogether
 			if(session.clients.size) {
-				// broadcastSession(session); //Deprecated
 				session.broadcastSessionState();
 			} else {
 				console.log(`Session ${session.id} removed`)

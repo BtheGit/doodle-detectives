@@ -35,7 +35,8 @@ function doodle(io) {
 					  clientId: client.id,
 					  clientName: client.name,
 					  color: generateRandomColor(),
-					  chatLog: session.getChatLog()
+					  chatLog: session.getChatLog(),
+					  paths: session.getPaths()
 					}
 				});
 				//Initialize session state

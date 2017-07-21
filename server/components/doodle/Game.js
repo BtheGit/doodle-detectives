@@ -11,6 +11,9 @@ const COLORS = [
 	'brown',
 	'teal'
 ]
+//Brainstorm secrets
+//ANIMALS: Monkey, Cheetah, Spider, Bee, Elephant
+//PEOPLE: Julius Caesar, Napoleon Bonaparte, Donald Trump, Charlie Chaplin
 
 const SECRETS = [
 	{
@@ -24,6 +27,10 @@ const SECRETS = [
 	{
 		category: 'Food',
 		secret: 'Banana Split'
+	},
+	{
+		category: 'Person',
+		secret: 'Jesus Christ'
 	},
 	{
 		category: 'Vehicle',
@@ -197,26 +204,6 @@ class Game {
 			player.socket.emit('packet', packet);
 		});
 	};
-
-	// _emitFakeNotFoundEndGame() {
-	// 	console.log('Emitting Fake Artist Is Not Found and Wins Scenario');
-	// 	this.state.currentPhase = GAMEOVER;
-	// 	const players = this.state.playerList.map(player => {
-	// 		return {
-	// 			name: player.name,
-	// 			color: player.color,
-	// 			isFake: player.isFake
-	// 		};
-	// 	});
-
-	// 	const packet = {
-	// 		type: 'fake_not_found',
-	// 		players
-	// 	};
-	// 	this.state.playerList.map(player => {
-	// 		player.socket.emit('packet', packet);
-	// 	});
-	// };
 
 	_emitGameOverResults() {
 		console.log('Game Over. Fake is winner:', this.isFakeWinner);

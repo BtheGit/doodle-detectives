@@ -21,13 +21,14 @@ class GameSession {
 		this.clients = new Set;
 		this.votedToBegin = new Set;
 		this.chatLog = [];
+		this.paths = [];
 		this.currentSessionStatus = WAITINGFORPLAYERS;
 		this.game = null;
 		// setTimeout(() => this.initGame(), 5000)
 		// this.usedSecrets = [] //figure out the best way to track variables like secrets/scores between games
 	}
 
-	//PUBLIC
+	//CHAT LOG
 	addChatMessage(msg) {
 		this.chatLog = [...this.chatLog, msg];
 	}
@@ -36,6 +37,20 @@ class GameSession {
 		return this.chatLog || [];
 	}
 
+	//DRAWING PATHS
+	addPath(path) {
+		this.paths = [...this.paths, path]
+	}
+
+	getPaths(){
+		return this.paths || [];
+	}
+
+	clearPaths(){
+		this.paths = [];
+	}
+
+	//VOTES TO BEGIN GAME
 	addVoteToBegin(client) {
 		this.votedToBegin.add(client)
 		this._updateVoteToBeginStatus();
