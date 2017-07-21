@@ -24,7 +24,6 @@
       const menuContainer = document.getElementById('menuContainer'); 
       let menuUpdateHandler;
 
-
       socket.on('connect', () => {
         console.log('Connected to server')
         menuUpdateHandler = setInterval(reqUpdates, 1000)

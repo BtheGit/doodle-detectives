@@ -62,9 +62,7 @@ class Game {
 		this.session = session; 
 		//NB: For the current implementation, the players cannot change after this point.
 		//Players leaving or not participating will wreck the game.
-
-		//Note to historians: Containing this in a state object was initially for the purposes of sending the
-		//whole thing in search of El Dorado. WOuld have found it too if it weren't for you meddling kids.
+		
 		this.state = {
 			currentPhase: '',
 			playerList: [],
@@ -200,25 +198,25 @@ class Game {
 		});
 	};
 
-	_emitFakeNotFoundEndGame() {
-		console.log('Emitting Fake Artist Is Not Found and Wins Scenario');
-		this.state.currentPhase = GAMEOVER;
-		const players = this.state.playerList.map(player => {
-			return {
-				name: player.name,
-				color: player.color,
-				isFake: player.isFake
-			};
-		});
+	// _emitFakeNotFoundEndGame() {
+	// 	console.log('Emitting Fake Artist Is Not Found and Wins Scenario');
+	// 	this.state.currentPhase = GAMEOVER;
+	// 	const players = this.state.playerList.map(player => {
+	// 		return {
+	// 			name: player.name,
+	// 			color: player.color,
+	// 			isFake: player.isFake
+	// 		};
+	// 	});
 
-		const packet = {
-			type: 'fake_not_found',
-			players
-		};
-		this.state.playerList.map(player => {
-			player.socket.emit('packet', packet);
-		});
-	};
+	// 	const packet = {
+	// 		type: 'fake_not_found',
+	// 		players
+	// 	};
+	// 	this.state.playerList.map(player => {
+	// 		player.socket.emit('packet', packet);
+	// 	});
+	// };
 
 	_emitGameOverResults() {
 		console.log('Game Over. Fake is winner:', this.isFakeWinner);
@@ -263,15 +261,6 @@ class Game {
 		});
 	}
 
-	// _emitFinalResultsEndGame() {
-	// 	this.state.playerList.map(player => {
-	// 		const packet = {
-	// 			type: 'final_results'
-	// 		};
-	// 		player.socket.emit('packet', packet);
-	// 	});
-	// }
-
 	/**
 	 * This function will find vote winner (or tie) from the Set this.fakeVotes.
 	 * First a hashmap will count votes, which is converted to an array for sorting.
@@ -310,7 +299,8 @@ class Game {
 			//No further rounds necessary. The fake wins outright because he wasn't found 
 			//and gets points. All players and their colors be revealed.
 			this.isFakeWinner = true;
-			this._emitFakeNotFoundEndGame();
+			// this._emitFakeNotFoundEndGame();
+			this._concludeGame();
 		}
 		else {
 			this.isFakeFound = true;
@@ -330,6 +320,11 @@ class Game {
 		this._concludeGame();
 	}
 
+	/**
+	 * Game Conclusion cleanup logic. The main thing to note here is that we are able to access the ability
+	 * to reset the Parent Session manager by using the session prop passed down at the beginning in the Game
+	 * constructor
+	 **/
 	_concludeGame() {
 		this._emitGameOverResults();
 		this.session.resetSessionStatusAfterGame();
@@ -359,7 +354,7 @@ class Game {
 	}
 
 	addVoteForFake(vote) {
-		//TODO Check if set already has client ID (double check for no double voting)
+		//TODO Check if set already has client ID (double check for no double voting). Can do with Map as below.
 		this.fakeVotes.add(vote)
 		//Check if all votes are received and tally
 		if(this.fakeVotes.size === this.state.playerList.length) {
@@ -369,14 +364,10 @@ class Game {
 
 	addVoteToApproveGuess(client, vote) {
 		console.log('Adding vote to approve guess', client, vote)
-
 		//Check to make sure the client isn't voting more than once
 		if(!this.votesToApprove.has(client)) {
 			this.votesToApprove.set(client, vote)
 		}
-		//Check if we have a number of votes equal to players - 1(fake) 
-		//NOTE: We could verify the IDs as well, but for the sake of expediency (this is a guess 
-		//verification step only)
 		if(this.votesToApprove.size >= (this.state.playerList.length - 1)) {
 			this._tallyApprovalVotes();
 		}
@@ -387,22 +378,6 @@ class Game {
 		this.state.fakeGuess = guess;
 		this._emitFakeGuessForApproval(guess);
 	}
-
-	// 	this._detectingVote()
-	// 	//wait for votes
-	// 	//tally votes 
-	// 	//---ties = automatic win for fake 
-	// 	// if(voteWinner !== fake || vote is a tie) -> go to gameover state and wait for restart
-
-
-	// }
-
-	//Need to set up our own internal 
-
-	// 	(LATER if player disconnects, start 60sec pause loop. If player returns before, resume, otherwise quit)
-	// 	(LATER blackmark on player for disconnect, enough = flag/ban)
-	// )
-
 
 }
 

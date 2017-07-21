@@ -19,6 +19,7 @@ exports.lobby = (req, res) => {
 //different url structure for existing rooms
 exports.room = (req, res) => {
 	if(!req.gameSession) {
+		console.log('No gameSession detected, redirecting back to lobby')
 		res.redirect('/doodle/lobby')
 	} 
 	else {

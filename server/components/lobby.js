@@ -4,7 +4,8 @@ const	{ gameSessionsMap, lobbyUsers, activePlayersMap } = require('../TEMPdb/db.
 module.exports = lobby;
 
 function lobby(io) {
-	io.of('/lobby').on('connection', (socket) => {
+	const lobbyIo = io.of('/lobby');
+	lobbyIo.on('connection', (socket) => {
 		console.log('Socket connection made:', socket.id)
 		lobbyUsers.set(socket.request.user.id, socket.request.user.name)
 
@@ -16,5 +17,9 @@ function lobby(io) {
 		socket.on('disconnect', () => {
 			lobbyUsers.delete(socket.request.user.id)
 		})
+	})
+	
+	lobbyIo.on('error', (socket) => {
+		console.log('Error in socket')
 	})
 }

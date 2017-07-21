@@ -1,4 +1,6 @@
 require('dotenv').config({path: __dirname + '/.env'});
+//DATABASE=mongodb://fcc-admin:fcc-password@ds139242.mlab.com:39242/fcc_projects
+
 
 const express 				= require('express'),
 			bodyParser 			= require('body-parser'),
@@ -24,8 +26,6 @@ mongoose.connection.on('error', (err) => {
   console.error(`🙅 🚫 🙅 🚫 🙅 🚫 🙅 🚫 → ${err.message}`);
 });
 //Import database models
-require('./models/URL_Abbr');
-require('./models/IMG_Search');
 require('./models/User');
 
 const sessionStore = new MongoStore({ mongooseConnection: mongoose.connection}) 
@@ -85,10 +85,19 @@ const io = require('socket.io')(server)
 const passportSocketIo = require('passport.socketio')
 const ioSessionMiddleWare = {
 		cookieParser,
-		key: process.env.KEY,
+		key: 'connect.sid',
 		secret: process.env.SECRET,
 		store: sessionStore,
+		// success: onAuthorizeSuccess,
+		// fail: onAuthorizeFail
 }
+// function onAuthorizeSuccess(data, accept){
+// 	console.log('Connection succeeded')
+// }
+// function onAuthorizeFail(data, message, error, accept){
+// 	console.log('Connection failed')
+// 	console.log(message)
+// }
 io.use(passportSocketIo.authorize(ioSessionMiddleWare))
 require('./components/lobby.js')(io)
 require('./components/doodle')(io) //Doodle Game Entry point

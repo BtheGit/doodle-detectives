@@ -23,7 +23,7 @@ class GameSession {
 		this.chatLog = [];
 		this.currentSessionStatus = WAITINGFORPLAYERS;
 		this.game = null;
-		setTimeout(() => this.initGame(), 5000)
+		// setTimeout(() => this.initGame(), 5000)
 		// this.usedSecrets = [] //figure out the best way to track variables like secrets/scores between games
 	}
 
@@ -105,7 +105,6 @@ class GameSession {
 		if(client.session) {
 			throw new Error ('Client already in session')
 		}
-
 		this.clients.add(client);
 		client.session = this;
 		this._checkPlayerQuotas()
