@@ -31,3 +31,11 @@ exports.parseMapForDB = (map) => {
 	})
 	return parsed;
 }
+
+exports.generateLobbyUsersList = (userMap) => {
+	let userList = [];
+	userMap.forEach(userName => {
+		userList.push(userName)
+	});
+	return userList;
+};

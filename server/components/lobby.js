@@ -1,5 +1,11 @@
-const	{ gameSessionsMap, lobbyUsers, activePlayersMap } = require('../TEMPdb/db.js'),
-			{ generateSessionsList } 													= require('./lobbyHelpers.js')
+const	{ gameSessionsMap, 
+				lobbyUsers, 
+				activePlayersMap
+			} 														= require('../TEMPdb/db.js'),
+			{ 
+				generateSessionsList,
+				generateLobbyUsersList
+			} 														= require('./lobbyHelpers.js')
 
 module.exports = lobby;
 
@@ -11,7 +17,11 @@ function lobby(io) {
 
 		socket.on('reqUpdate', () => {
 			const rooms = generateSessionsList(gameSessionsMap)
-			socket.emit('getUpdate', rooms)
+			const users = generateLobbyUsersList(lobbyUsers)
+			socket.emit('getUpdate', {
+				rooms,
+				users
+			})
 		})
 
 		socket.on('disconnect', () => {
