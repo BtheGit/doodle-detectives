@@ -70,10 +70,10 @@ exports.createClient = (req,res, next) => {
 		next()
 	}
 	else {
-		//Lookup activePlayersMap for existing userID. 
-		//Check it's current session id
-		//If it matches current url, don't change it (allowing for player reconnects)
-		//If it doesn't match, delete and create new client
+		//TODO Lookup activePlayersMap for existing userID. 
+		//TODO Check it's current session id
+		//TODO If it matches current url, don't change it (allowing for player reconnects)
+		//TODO If it doesn't match, delete and create new client
 		client = new GameClient(null, req.user.name, req.user.id); //Socket will be setup on page load
 		//Add client to activePlayersMap
 		activePlayersMap.set(req.user.id, client)

@@ -16,7 +16,7 @@ function doodle(io) {
 	const gameroom = io.of('/gameroom');
 	gameroom.on('connection', (socket) => {
 		let client = activePlayersMap.get(socket.request.user.id);
-		if(client) {
+		if(client && client.session) {
 			console.log('Gameroom connection detected:', socket.id, socket.request.user.name)
 			
 			//Socket will wait for client information before creating client and (joining it to/creating) a game session
@@ -25,7 +25,6 @@ function doodle(io) {
 			socket.on('setup_client', (packet) => {
 				//We need to append the new socket to the existing client to allow 
 				//communication during game
-				// client = activePlayersMap.get(socket.request.user.id)
 				client.socket = socket
 				session = client.session
 				client.send({
@@ -54,7 +53,6 @@ function createGameSession(id) {
 	if(gameSessionsMap.has(id)){
 		throw new Error('Session already exists')
 	}
-
 	const session = new GameSession(id);
 	gameSessionsMap.set(id, session);	
 	

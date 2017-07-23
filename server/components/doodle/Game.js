@@ -5,7 +5,6 @@ const COLORS = [
 	'blue',
 	'red',
 	'orange',
-	'pink',
 	'indigo',
 	'violet',
 	'brown',

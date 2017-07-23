@@ -3,19 +3,34 @@
 <head>
   <meta charset="UTF-8">
   <title>Landing Page</title>
+  <link rel="stylesheet" href="/styles/landing.css">
 </head>
 <body>
-  <h1>GAMES MENU</h1>
-  <% if(locals.user) {%>
-    <p>Welcome <%=locals.user.name%> </p>
-    <div><a href="/doodle/lobby">Doodle Detectives</a></div>
-    <div><a href="/tetris/lobby">Tetris</a></div>
-    <div><a href="/user/profile">Profile</a></div>
-    <div><a href="/user/logout">Logout</a></div>
-  <% } else { %>
-    <div><a href="/user/register">Register</a></div>
-    <div><a href="/user/login">Login</a></div>
-  <% } %>
-  <a href="/private"></a>
+  <div class="menu-container-outer">
+    <div class="menu-container-inner">
+      <% if(locals.user) {%>
+        <p>Welcome <%=locals.user.name%> </p>
+        <div><a href="/doodle/lobby">Doodle Detectives</a></div>
+        <div><a href="/user/profile">Profile</a></div>
+        <div><a href="/user/logout">Logout</a></div>
+      <% } else { %>
+        <div class="form login-container">
+          <form class="login-form" action="/user/login" method="POST">
+            <input type="email" name="email" placeholder="Email"/>
+            <input type="password" name="password" placeholder="Password"/>
+            <button type="submit" value="Log In">Log In</button>
+            <p class="message">Not registered? <a href="/user/register">Create an account</a></p>
+          </form>
+        </div>
+        <div class="form">
+          <form class="forgot-form" action="/user/account/forgot" method="POST">
+            <label for="email">Email</label>
+            <input type="email" name="email">
+            <button type="submit">Reset Password</button>
+          </form>
+        </div>
+      <% } %>
+    </div>
+  </div>
 </body>
 </html>
