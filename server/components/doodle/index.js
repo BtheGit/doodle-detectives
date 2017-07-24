@@ -38,10 +38,10 @@ function doodle(io) {
 					  paths: session.getPaths()
 					}
 				});
-				//Initialize session state
-				session.broadcastSessionState();
 				//Initiate Packet Handlers
 				gameroomSocketHandlers(socket, client, session, gameSessionsMap);
+				//Initialize session state
+				session.broadcastSessionState();
 			})
 		}
 	})

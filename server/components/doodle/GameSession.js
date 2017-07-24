@@ -107,11 +107,16 @@ class GameSession {
 		}
 
 		//Broadcast state to every player
-		clients.forEach( client => {
-			client.send({
-				type: 'session_state_update',
-				sessionState
-			})
+		clients.forEach(client => {
+			if(client.socket && client.socket.connected) {
+				client.send({
+					type: 'session_state_update',
+					sessionState
+				})
+			}
+			else {
+				console.log('Couldn\'t send update. No socket available for', client.id)
+			}
 		})			
 	}
 
@@ -171,6 +176,7 @@ class GameSession {
 	 * @param  {Object} client [Gives us access to the id of the active player] 
 	 */
 	nextTurn(client) {
+		console.log('next turn request', client.id) //For testing REMOVE
 		const curTurn = this.game.retrieveState().currentTurn
 		if(curTurn.id === client.id) {
 			this.game.nextTurn()
