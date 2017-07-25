@@ -158,8 +158,6 @@ class GameSession {
 		// These paths are doodles in between game sessions
 		this.clearPaths();
 		this._emitGameWillStartAlert(); 
-		//Clear votes for next game //disabled for testing
-		// this.votedToBegin.clear();
 		//This will flag the client to render the status bar differently
 		this.currentSessionStatus = GAMEACTIVE;
 		//Create a copy of players for the game to manipulate without affecting session members

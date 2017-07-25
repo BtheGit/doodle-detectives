@@ -89,11 +89,12 @@ class Game {
 
 		//Basic Setup
 		this.state.playerList = this._setupPlayers(players);
+		this._updatePlayerColors(this.state.playerList);
 		this.state.turnList = this._createTurnList(this.state.playerList);
 		this.state.secret = this._generateSecret(SECRETS);
 
 		//Initialize Game
-		console.log('Starting main game sequence');
+		console.log('Starting Game');
 		this._start();
 	};
 
@@ -151,6 +152,7 @@ class Game {
 		this.state.currentPhase = DISPLAYSECRET;
 		this._displaySecret(this.state.secret);
 		console.log('Starting first turn');
+		//In the real game give them 10-15 seconds with the secret to process.
 		setTimeout(() => {
 			this.state.currentPhase = DRAWING;
 			this.nextTurn()
@@ -158,6 +160,21 @@ class Game {
 	};
 
 	//############ EMITTERS ###############
+	//
+	_updatePlayerColors(players) {
+		const playerColors = {};
+		players.forEach(player => {
+			playerColors[player.id] = player.color;
+		})
+		console.log(playerColors)
+		const packet = {
+			type: 'update_player_colors',
+			playerColors
+		};
+		players.forEach(player => {
+			player.socket.emit('packet', packet);
+		});
+	}
 
 	//Here I am manually accessing the sockets stored in the mutable playerList (instead of using a higher order
 	//function passed from the gameSession) to emit the secret to all players except the fake who only receives
@@ -184,7 +201,9 @@ class Game {
 				type: 'next_turn',
 				payload: {
 					active: player.id === turn.id,
-					color: turn.color
+					color: turn.color,
+					name: turn.name,
+					id: turn.id
 				}
 			};
 			player.socket.emit('packet', packet);
@@ -205,7 +224,6 @@ class Game {
 	};
 
 	_emitGameOverResults() {
-		console.log('Game Over. Fake is winner:', this.isFakeWinner);
 		this.state.currentPhase = GAMEOVER;
 		const players = this.state.playerList.map(player => {
 			return {
@@ -279,7 +297,6 @@ class Game {
 		if(tallyArr[0].color !== this.fakePlayer.color) {
 			fakeNotFound = true;
 		}
-		console.log('Fake wins:', fakeNotFound)
 		//TODO set variables to results, determine whether to initiatiate fake guessing phase or display final results
 		if(fakeNotFound) {
 			//No further rounds necessary. The fake wins outright because he wasn't found 

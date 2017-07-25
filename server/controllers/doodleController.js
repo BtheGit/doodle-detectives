@@ -74,7 +74,12 @@ exports.createClient = (req,res, next) => {
 		//TODO Check it's current session id
 		//TODO If it matches current url, don't change it (allowing for player reconnects)
 		//TODO If it doesn't match, delete and create new client
-		client = new GameClient(null, req.user.name, req.user.id); //Socket will be setup on page load
+		const randomID = new Date().valueOf() + generateRandomId(16)
+		// client = new GameClient(null, req.user.name, req.user.id); //Socket will be setup on page load 
+		// The original idea of using the DB id was to be able to assist in reconnects. But until that is implemented
+		// I think it's better to use a tempId that is safe to broadcast to other players (even though I've
+		// already largely implemented the game working around that limitation, I will use it in color matching at least)
+		client = new GameClient(null, req.user.name, randomID); //Socket will be setup on page load
 		//Add client to activePlayersMap
 		activePlayersMap.set(req.user.id, client)
 		//Add client to session
