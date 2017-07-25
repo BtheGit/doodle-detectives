@@ -2,20 +2,25 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Doodle Detective Lobby</title>
   <link rel="stylesheet" href="/styles/lobby.css">
 </head>
 <body>
 
-    <div id="logoFlexBox">
-      <h1>Doodle Detective</h1>
+    <div class="headerContainer">
+      <div class="logo-image">
+        <img src="/images/title2.png">
+      </div>
       <div><a href="/user/profile">Profile</a></div>
       <div><a href="/user/logout">Logout</a></div>
     </div>
-    <div id="menuContainer"></div>
-    <div id="lobbyUsers"></div>
-    <div id="newRoomContainer">
-      <a href="/doodle/room" class="action-button shadow">Create New Room</a>
+    <div class="container">
+      <div id="lobbyUsers"></div>
+      <div id="menuContainer"></div>
+      <div class="newRoomContainer">
+        <a href="/doodle/room" class="action-button shadow">Create New Room</a>
+      </div>
     </div>
 
     <script src="/socket.io/socket.io.js"></script>
@@ -81,9 +86,10 @@
           content = userList.map(user => {
             return `<div class="user">${user}</div>`
           })
+          content = `<div class="user-title">Lobby Users</div><div class="user-list">${content}</div>`;
         }
         else {
-          content=`<div class="user">Lobby Empty</div>`
+          content=`<div class="user-list"><div class="user">Lobby Empty</div></div>`
         }
         usersContainer.innerHTML = content;
       }
