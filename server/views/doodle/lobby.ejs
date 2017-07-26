@@ -86,7 +86,7 @@
           content = userList.map(user => {
             return `<div class="user">${user}</div>`
           })
-          content = `<div class="user-title">Lobby Users</div><div class="user-list">${content}</div>`;
+          content = `<div class="user-title">Lobby Users</div><div class="user-list">${content.join('')}</div>`;
         }
         else {
           content=`<div class="user-list"><div class="user">Lobby Empty</div></div>`

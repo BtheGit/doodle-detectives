@@ -159,13 +159,13 @@ body {
 	background-color: #18F018;
 	border-bottom: 3px solid #14BF14;
 	text-shadow: 0px -2px #14BF14;
-	transition: all 0.1s;
 	-webkit-transition: all 0.1s;
+	transition: all 0.1s;
 }
 
 .join-button:active	{
-	transform: translate(0px,5px);
   -webkit-transform: translate(0px,5px);
+	transform: translate(0px,5px);
 	border-bottom: 1px solid;
 }
 
@@ -183,8 +183,8 @@ body {
 	text-shadow: 0px -2px #B99116;*/
 	background-color: #FF2B2B;
 	text-shadow: 0px -2px #A71E1E;
-	transition: all 0.1s;
 	-webkit-transition: all 0.1s;
+	transition: all 0.1s;
 }	
 
 .newRoomContainer {

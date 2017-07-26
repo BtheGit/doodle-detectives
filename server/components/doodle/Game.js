@@ -156,7 +156,7 @@ class Game {
 		setTimeout(() => {
 			this.state.currentPhase = DRAWING;
 			this.nextTurn()
-		}, 1000);
+		}, 12000);
 	};
 
 	//############ EMITTERS ###############
@@ -188,7 +188,8 @@ class Game {
 						category: secret.category,
 						secret: `${player.isFake ? 'XXX' : secret.secret}`
 					},
-					fakeIsMe: player.isFake
+					fakeIsMe: player.isFake,
+					displayLength: 10
 				}
 			};
 			player.socket.emit('packet', packet)
