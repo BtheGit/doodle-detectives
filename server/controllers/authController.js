@@ -12,7 +12,7 @@ exports.isLoggedIn = (req, res, next) => {
 	if(req.isAuthenticated()) return next();
 	//Flash failure and return to login
 	req.flash('error', 'Oops you must be logged in to do that!');
-	res.redirect('/user/login');
+	res.redirect('/');
 }
 
 exports.confirmedPasswords = (req, res, next) => {
@@ -36,12 +36,12 @@ exports.verifyToken = async (req, res, next) => {
 	//If no user found (which could just mean token is expired)
 	req.flash('error', 'Password reset is invalid or expired');
 	//TODO redirect to get reset token route
-	res.redirect('/user/login');
+	res.redirect('/');
 }
 
 //ROUTES
 exports.login = passport.authenticate('local', {
-	failureRedirect: '/user/login',
+	failureRedirect: '/',
 	failureFlash: 'Failed Login!',
 	successRedirect: '/',
 	successFlash: 'Logged in.'
@@ -61,7 +61,7 @@ exports.forgot =  async (req, res) => {
 	//No match:
 	if(!user) {
 		req.flash('error', 'Email address not found');
-		res.redirect('/user/login');
+		res.redirect('/');
 	}
 
 	//Create and set reset token and expiry time on DB account (1 hr)
@@ -79,7 +79,7 @@ exports.forgot =  async (req, res) => {
 	})
 	req.flash('success', `You have been emailed a password reset link.`);
 	//4) Redirect to login
-	res.redirect('/user/login')
+	res.redirect('/')
 }
 
 exports.update = async (req, res) => {

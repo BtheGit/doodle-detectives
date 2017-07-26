@@ -40,7 +40,8 @@ exports.validateRegister = (req, res, next) => {
 	if(errors) {
 		//errors will be handled instead of passed to middleware
 		req.flash('error', errors.map(err => err.msg));
-		res.render('./user/register', {locals: {body: req.body, flashes: req.flash()}});
+		res.redirect('/');
+		// res.render('./user/register', {locals: {body: req.body, flashes: req.flash()}});
 		return;
 	}
 
