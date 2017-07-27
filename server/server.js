@@ -20,7 +20,21 @@ const express 				= require('express'),
 			
 //DB STUFF 
 const mongoose = require('mongoose');
-mongoose.connect(process.env.DATABASE);
+const mongo_options = { 
+	server: { 
+		socketOptions: { 
+			keepAlive: 300000, 
+			connectTimeoutMS: 30000 
+		} 
+	}, 
+  replset: { 
+  	socketOptions: { 
+  		keepAlive: 300000, 
+  		connectTimeoutMS : 30000 
+  	} 
+  } 
+};       
+mongoose.connect(process.env.MONGODB_URI, mongo_options);
 mongoose.Promise = global.Promise;  // Tell Mongoose to use ES6 promises
 mongoose.connection.on('error', (err) => {
   console.error(`🙅 🚫 🙅 🚫 🙅 🚫 🙅 🚫 → ${err.message}`);
