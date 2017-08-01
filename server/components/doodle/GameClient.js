@@ -28,7 +28,9 @@ class GameClient {
 
 	//Send a message to just this client
 	send(packet) {
-		this.socket.emit('packet', packet)
+		if(this.socket) {
+			this.socket.emit('packet', packet)
+		}
 	}
 }
 

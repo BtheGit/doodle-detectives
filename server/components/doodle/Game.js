@@ -32,13 +32,153 @@ const SECRETS = [
 		secret: 'Jesus Christ'
 	},
 	{
+		category: 'Person',
+		secret: 'Albert Einstein'
+	},
+	{
+		category: 'Profession',
+		secret: 'King'
+	},
+	{
+		category: 'Profession',
+		secret: 'Actor'
+	},
+	{
 		category: 'Vehicle',
 		secret: 'Helicopter'
+	},
+	{
+		category: 'Vehicle',
+		secret: 'Taxi'
 	},
 	{
 		category: 'Halloween',
 		secret: 'Headless Horseman'
 	},
+	{
+		category: 'Halloween',
+		secret: 'Witch'
+	},
+	{
+		category: 'Halloween',
+		secret: 'Frankenstein'
+	},
+	{
+		category: 'Halloween',
+		secret: 'Zombie'
+	},
+	{
+		category: 'Place',
+		secret: 'Library'
+	},
+	{
+		category: 'Place',
+		secret: 'Movie Theater'
+	},
+	{
+		category: 'Place',
+		secret: 'School'
+	},
+	{
+		category: 'Place',
+		secret: 'Prison'
+	},
+	{
+		category: 'Animal',
+		secret: 'Monkey'
+	},
+	{
+		category: 'Food',
+		secret: 'Pineapple'
+	},
+	{
+		category: 'Animal',
+		secret: 'Hippo'
+	},
+	{
+		category: 'Food',
+		secret: 'Hamburger'
+	},
+	{
+		category: 'Food',
+		secret: 'Spaghetti'
+	},
+	{
+		category: 'Sports',
+		secret: 'Surfing'
+	},
+	{
+		category: 'Food',
+		secret: 'Sushi'
+	},
+	{
+		category: 'Food',
+		secret: 'Popcorn'
+	},
+	{
+		category: 'Movies',
+		secret: 'Titanic'
+	},
+	{
+		category: 'Movies',
+		secret: 'Harry Potter'
+	},
+	{
+		category: 'Movies',
+		secret: 'Batman'
+	},
+	{
+		category: 'Movies',
+		secret: 'Spider-Man'
+	},
+	{
+		category: 'Animal',
+		secret: 'Penguin'
+	},
+	{
+		category: 'Vehicle',
+		secret: 'UFO'
+	},
+	{
+		category: 'Household Objects',
+		secret: 'Mirror'
+	},
+	{
+		category: 'City',
+		secret: 'Paris'
+	},
+	{
+		category: 'City',
+		secret: 'New York'
+	},
+	{
+		category: 'Sports',
+		secret: 'Table Tennis'
+	},
+	{
+		category: 'Sports',
+		secret: 'Karate'
+	},
+	{
+		category: 'Sports',
+		secret: 'Sumo Wrestling'
+	},
+	{
+		category: 'Sports',
+		secret: 'Darts'
+	},
+	{
+		category: 'Sports',
+		secret: 'Badminton'
+	},
+	{
+		category: 'Kitchen',
+		secret: 'Tea Kettle'
+	},
+	{
+		category: 'Kitchen',
+		secret: 'Microwave'
+	}
 ]
 
 //Fischer-Yates Shuffle
@@ -288,7 +428,7 @@ class Game {
 				count: tally[vote]
 			});
 		};
-		tallyArr.sort((a,b) => a.count - b.count);
+		tallyArr.sort((a,b) => b.count - a.count);
 		if(tallyArr.length > 1) { //This check shouldn't be needed, but I'm testing with one player right now
 			if(tallyArr[0].count === tallyArr[1].count) {
 				isTie = true;
@@ -298,7 +438,6 @@ class Game {
 		if(tallyArr[0].color !== this.fakePlayer.color) {
 			fakeNotFound = true;
 		}
-		//TODO set variables to results, determine whether to initiatiate fake guessing phase or display final results
 		if(fakeNotFound) {
 			//No further rounds necessary. The fake wins outright because he wasn't found 
 			//and gets points. All players and their colors be revealed.

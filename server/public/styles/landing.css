@@ -13,9 +13,7 @@ body {
 	align-items: flex-end;
 }
 
-.hidden {
-	display: none;
-}
+
 
 .menu-container-outer {
 	width: 40%;
@@ -26,6 +24,7 @@ body {
 }
 
 .menu-container-inner {
+	position: relative;
 	width: 60%;
 	height: 90%;
 	background-color: rgba(50,50,50, 0.4);
@@ -38,6 +37,7 @@ body {
 .form-container > form {
 	height: 100%;
 	width: 100%;
+	opacity: 1;
 }
 
 .form-container input {
@@ -54,7 +54,8 @@ body {
 .form-container button { 
 	background-color: #004F59;
 	border: none;
-	padding: 15px 5px;
+	font-size: 1.5em;
+	padding: 10px 5px;
 	margin-left: 10px;
 	margin-top: 20px;	
 	width: 93%;
@@ -67,4 +68,58 @@ body {
 a {
 	text-decoration: none;
 	color: white;
+}
+
+.message {
+	box-sizing: border-box;
+	padding: 0px 15px;
+	font-size: 16px;
+	cursor: default;
+}
+
+.message > span {
+	color: #fbb71e;
+	font-size: 20px;
+	font-weight: bolder;
+	cursor: pointer;
+}
+
+#login-container {
+	display: block;
+	position: absolute;
+	transition: all 450ms ease-in-out;
+
+}
+
+#login-container.hidden {
+	visibility: hidden;
+	display: inline-block;
+	transform: rotateY(180deg);
+	opacity: 0;
+}
+
+#reset-container {
+	position: absolute;
+	display: block;
+	transition: all 400ms ease-in-out;
+}
+
+#reset-container.hidden {
+	scale: (0);
+	transform: translateY(-100%);
+	opacity: 0;
+	visibility: hidden;
+}
+
+#register-container {
+	position: absolute;
+	display: block;
+	transition: all 450ms ease-in-out;
+}
+
+#register-container.hidden {
+	visibility: hidden;
+	opacity: 0;
+	display: inline-block;
+	transform: rotateY(-180deg);
 }

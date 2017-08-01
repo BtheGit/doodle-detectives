@@ -20,6 +20,7 @@
             <input type="password" name="password" placeholder="Password"/>
             <button type="submit" value="Log In">Log In</button>
           </form>
+          <p class="message">Not registered? <span id="trigger-register">Create an account</span></p>
           <p class="message">Forgot your password? <span id="trigger-reset">Reset Password</span></p>
           <div class="form-container hidden" id="reset-container">
             <form class="forgot-form" action="/user/account/forgot" method="POST">
@@ -27,14 +28,13 @@
               <button type="submit">Reset Password</button>
             </form>
           </div>
-          <p class="message">Not registered? <span id="trigger-register">Create an account</span></p>
         </div>
         <div class="form-container hidden" id="register-container">
           <form class="register-form" action="/user/register" method="POST">
             <input type="text" name="name" placeholder="Username..."/>
             <input type="text" name="email" placeholder="Email..."/>
             <input type="password" name="password" placeholder="Enter your password..."/>
-            <input type="password" name="password-confirm" placeholder="Re-enter your password..."/>
+            <input type="password" name="password-confirm" placeholder="Confirm password..."/>
             <button>Create Account</button>
             <p class="message">Already registered? <span id="trigger-login">Sign In</span></p>
           </form>
