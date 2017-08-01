@@ -8,7 +8,7 @@
 </head>
 <body>
 
-    <div class="headerContainer">
+    <div class="header-container">
       <div class="logo-image">
         <img src="/images/title2.png">
       </div>
@@ -16,13 +16,14 @@
       <div><a href="/user/logout">Logout</a></div>
     </div>
     <div class="container">
-      <div id="lobbyUsers"></div>
-      <div class="buttonContainer">
-        <div id="menuContainer">
+      <div id="lobby-users"></div>
+      <div class="button-container">
+        <div id="menu-container">
+          <div class="loading-rooms">Loading <span>.</span> <span>.</span> <span>.</span></div>
           <!-- <div class="newRoomContainer"> -->
           <!-- </div> -->
         </div>
-        <a href="/doodle/room" class="action-button shadow">Create New Room</a>
+        <a href="/doodle/room" class="action-button">+</a>
         
       </div>
     </div>
@@ -30,8 +31,8 @@
     <script src="/socket.io/socket.io.js"></script>
     <script>
       const socket = io.connect('/lobby')
-      const menuContainer = document.getElementById('menuContainer'); 
-      const usersContainer = document.getElementById('lobbyUsers')
+      const menuContainer = document.getElementById('menu-container'); 
+      const usersContainer = document.getElementById('lobby-users')
       let menuUpdateHandler;
 
       socket.on('connect', () => {
@@ -60,21 +61,21 @@
                             ? `<p class="full-button">ROOM FULL</p>` 
                             : `<a class="join-button" href="/doodle/room/${array[i].sessionId}">JOIN</a>`
             const room =
-                   `<div class="roomContainer">
-                    <div class="roomName">
+                   `<div class="room-container">
+                    <div class="room-name">
                       ${array[i].clients}
                     </div>
-                    <div class="roomPop">
+                    <div class="room-pop">
                       ${array[i].pop} / 8
                     </div>
-                    <div class="roomLink">
+                    <div class="room-link">
                       ${link}
                     </div>
                   </div>`;
             content += room
           }
         } else {
-          content=`<div class='roomContainer'>NO ACTIVE ROOMS</div>`
+          content=`<div class='room-container no-cases'><p>NO OPEN CASES</p></div>`
         }
         menuContainer.innerHTML = content;
       }
@@ -90,7 +91,7 @@
           content = userList.map(user => {
             return `<div class="user">${user}</div>`
           })
-          content = `<div class="user-title">Lobby Users</div><div class="user-list">${content.join('')}</div>`;
+          content = `<div class="user-title">UNASSIGNED</div><div class="user-list">${content.join('')}</div>`;
         }
         else {
           content=`<div class="user-list"><div class="user">Lobby Empty</div></div>`

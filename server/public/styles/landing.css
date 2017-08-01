@@ -13,8 +13,6 @@ body {
 	align-items: flex-end;
 }
 
-
-
 .menu-container-outer {
 	width: 40%;
 	height: 70%;
@@ -65,10 +63,6 @@ body {
 	cursor: pointer;
 }
 
-a {
-	text-decoration: none;
-	color: white;
-}
 
 .message {
 	box-sizing: border-box;
@@ -122,4 +116,62 @@ a {
 	opacity: 0;
 	display: inline-block;
 	transform: rotateY(-180deg);
+}
+
+.main-menu {
+	box-sizing: border-box;
+	padding: 10px;
+	height: 100%;
+}
+
+.main-menu h2 {
+	box-sizing: border-box;
+	position: relative;
+	text-align: center;
+	font-size: 1.5em;
+	height: 20%;
+	margin: 15px 0 0 0;
+	color: #fbb71e;
+}
+
+.main-menu h2:after {
+	content: ' ';
+	position: absolute;
+	bottom: 20%;
+	left: 25%;
+	height: 100%;
+	width: 50%;
+	border-bottom: 1px solid red;
+}
+
+.main-menu h2 span {
+	font-size: 1.3em;
+}
+
+.main-menu > .menu-options {
+	height: 70%;
+	display: flex;
+	flex-direction: column;
+	justify-content: space-around;
+	align-items: center;
+}
+
+.menu-options div {
+	font-size: 2em;
+	transition: all 200ms ease-in-out;
+}
+
+.menu-options div a {
+	text-decoration: none;
+	color: white;	
+	transition: color 100ms ease-in-out;
+
+}
+
+.menu-options div:hover {
+	transform: scale(1.1);
+}
+
+.menu-options div:hover a {
+	color: #7FA9FF;
 }
