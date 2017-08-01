@@ -4,6 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Doodle Detective Lobby</title>
+  <link href="https://fonts.googleapis.com/css?family=Special+Elite" rel="stylesheet">
   <link rel="stylesheet" href="/styles/lobby.css">
 </head>
 <body>
@@ -12,12 +13,20 @@
       <div class="logo-image">
         <img src="/images/title2.png">
       </div>
-      <div><a href="/user/profile">Profile</a></div>
-      <div><a href="/user/logout">Logout</a></div>
     </div>
     <div class="container">
-      <div id="lobby-users"></div>
+      <div class="lobby-users-outer">
+        <div class="paper"></div>
+        <div class="lobby-users-inner">
+          <div class="lobby-users-header">UNASSIGNED</div>
+          <div id="lobby-users-list"></div>
+        </div>
+      </div>
       <div class="button-container">
+        <div class="tabs">
+          <div><a href="/user/profile">Profile</a></div>
+          <div><a href="/user/logout">Logout</a></div> 
+        </div>
         <div id="menu-container">
           <div class="loading-rooms">Loading <span>.</span> <span>.</span> <span>.</span></div>
           <!-- <div class="newRoomContainer"> -->
@@ -32,7 +41,7 @@
     <script>
       const socket = io.connect('/lobby')
       const menuContainer = document.getElementById('menu-container'); 
-      const usersContainer = document.getElementById('lobby-users')
+      const usersContainer = document.getElementById('lobby-users-list')
       let menuUpdateHandler;
 
       socket.on('connect', () => {
@@ -58,8 +67,8 @@
         if(array.length) {
           for (let i = 0; i < array.length; i++) {
             const link = array[i].pop >= 8 
-                            ? `<p class="full-button">ROOM FULL</p>` 
-                            : `<a class="join-button" href="/doodle/room/${array[i].sessionId}">JOIN</a>`
+                            ? `<p class="room-button full-button">ROOM FULL</p>` 
+                            : `<a class="room-button join-button" href="/doodle/room/${array[i].sessionId}">JOIN</a>`
             const room =
                    `<div class="room-container">
                     <div class="room-name">
@@ -75,7 +84,7 @@
             content += room
           }
         } else {
-          content=`<div class='room-container no-cases'><p>NO OPEN CASES</p></div>`
+          content=`<div class='no-cases'><p>NO OPEN CASES</p></div>`
         }
         menuContainer.innerHTML = content;
       }
@@ -91,7 +100,7 @@
           content = userList.map(user => {
             return `<div class="user">${user}</div>`
           })
-          content = `<div class="user-title">UNASSIGNED</div><div class="user-list">${content.join('')}</div>`;
+          content = `<div class="user-list">${content.join('')}</div>`;
         }
         else {
           content=`<div class="user-list"><div class="user">Lobby Empty</div></div>`

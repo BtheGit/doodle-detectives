@@ -1,0 +1,30 @@
+html, body {
+	height: 100%;
+	width: 100%;
+	margin: 0;
+	padding: 0;
+	background: radial-gradient(#232D2C 30%,#1E1E1F);
+
+}
+
+.navbar {
+	color: white;
+}
+
+.container {
+	font-family: 'Special Elite', cursive;
+	font-size: 24px;
+	line-height: 1.5em;
+	margin: 0 auto;
+	max-width: 800px;
+}
+
+.paper-outer {
+	box-sizing: border-box;
+	background: #F8EB60;
+	padding: 3% 5% 3% 5%;
+}
+
+h1 {
+	text-align: center;
+}

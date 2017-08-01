@@ -3,6 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <title>Landing Page</title>
+  <link href="https://fonts.googleapis.com/css?family=Special+Elite" rel="stylesheet">
   <link rel="stylesheet" href="/styles/landing.css">
 </head>
 <body>
@@ -10,7 +11,7 @@
     <div class="menu-container-inner">
       <% if(locals.user) {%>
       <div class="main-menu">
-        <h2>Welcome <span><%=locals.user.name%></span></h2>
+        <h2>Welcome  <span> <%=locals.user.name%></span></h2>
         <div class="menu-options">
           <div><a href="/doodle/lobby">Game Lobby</a></div>
           <div><a href="/user/rules">How to Play</a></div>
