@@ -43,7 +43,7 @@ body {
 .container {
 	position: relative;
 	z-index: 10;
-	height: 60%;
+	height: 65%;
 	width: 80%;
 	margin: 0 auto;
 	display: flex;
@@ -162,7 +162,7 @@ body {
 	font-size: 25px;
 	border: 5px solid rgba(198,198,233, 0.2);
 	border-radius: 5px;
-	box-shadow: 0 19px 38px rgba(0,0,0,0.30), 0 15px 12px rgba(0,0,0,0.22);
+	box-shadow: 0 19px 38px rgba(0,0,0,0.30), 0 15px 12px rgba(0,0,0,0.22), 0px -1px 10px -3px rgba(0,0,0,0.3);
 }
 
 #menu-container::-webkit-scrollbar {
@@ -180,12 +180,12 @@ body {
 
 .tabs {
   position: absolute;
-  width: 430px;
+  width: 380px;
   top: 0px;
   right: 0px;
   text-align: center;
-  display: flex;
-  justify-content: space-around;
+  /*display: flex;*/
+  /*justify-content: space-around;*/
 }
 
 .tabs div {
@@ -196,8 +196,13 @@ body {
   border-radius: 6px 6px 0px 0px;
   padding-top: 10px;
   transform: translateY(-100%);
-  background: #CEC136;
+  background: #ddd14e;
   transition: all 150ms ease-in-out;
+}
+
+.tabs div:nth-child(2) {
+    transform: translateX(88%) translateY(-200%);
+    box-shadow: 0px 0px 5px 0px black;
 }
 
 .tabs div a {
@@ -348,7 +353,7 @@ body {
 	background-color: #FFC000;
 	border-bottom: 5px solid #B99116;
 	text-shadow: 0px -2px #B99116;
-	transition: all 0.1s;
+	transition: all 250ms ease-in-out;
 	-webkit-transition: all 0.1s;
 	transform-origin: 50% 300%;
 	transform: translateY(-50%);
@@ -356,7 +361,7 @@ body {
 
 .action-button:hover {
 	box-shadow: 0px 0px 5px 0px black;
-	background-color: #FFDE00;
+	background-color: #FFA200;
 	border-bottom: 5px solid #D1A418;
 	transform: scale(1.2);
 }
