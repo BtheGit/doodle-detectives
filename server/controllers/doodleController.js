@@ -57,10 +57,10 @@ exports.joinRoom = (req, res, next) => {
 		next()
 	}
 	//If game already in session, redirect to lobby with flash 'Game already started. Can't join.''
-	if(gameSession.currentSessionStatus === 'isGameActive') {
-		//TODO: Flash 'Game already started. Can't join.'
-		next()
-	}
+	// if(gameSession.currentSessionStatus === 'isGameActive') {
+	// 	//TODO: Flash 'Game already started. Can't join.'
+	// 	next()
+	// }
 	//TODO If full already redirect to lobby with flash 'Full'
 	
 	//Attach gameSessionto req
@@ -75,21 +75,26 @@ exports.createClient = (req,res, next) => {
 		next()
 	}
 	else {
-		//TODO Lookup activePlayersMap for existing userID. 
-		//TODO Check it's current session id
-		//TODO If it matches current url, don't change it (allowing for player reconnects)
-		//TODO If it doesn't match, delete and create new client
-		const randomID = new Date().valueOf() + generateRandomId(16)
-		// client = new GameClient(null, req.user.name, req.user.id); //Socket will be setup on page load 
-		// The original idea of using the DB id was to be able to assist in reconnects. But until that is implemented
-		// I think it's better to use a tempId that is safe to broadcast to other players (even though I've
-		// already largely implemented the game working around that limitation, I will use it in color matching at least)
-		client = new GameClient(null, req.user.name, randomID); //Socket will be setup on page load
-		//Add client to activePlayersMap
-		activePlayersMap.set(req.user.id, client)
-		//Add client to session
-		req.gameSession.join(client)
-		next()	
+		//Don't let players join multiple sessions. Delete dangling session if it was just created and empty.
+		if(activePlayersMap.has(req.user.id)) {
+			res.redirect('/doodle/lobby')
+			if(!req.gameSession.clients.size) {
+				gameSessionsMap.delete(req.gameSession.id)
+			}
+		}
+		else {
+			//TODO Check it's current session id
+			//TODO If it matches current url, don't change it (allowing for player reconnects)
+			//TODO If it doesn't match, delete and create new client
+			const randomID = new Date().valueOf() + generateRandomId(16)
+			// The original idea of using the DB id was to be able to assist in reconnects. But until that is implemented
+			// I think it's better to use a tempId that is safe to broadcast to other players (even though I've
+			// already largely implemented the game working around that limitation, I will use it in color matching at least)
+			client = new GameClient(null, req.user.name, randomID); //Socket will be setup on page load
+			activePlayersMap.set(req.user.id, client)
+			req.gameSession.join(client)
+			next()	
+		}
 	}
 }
 
