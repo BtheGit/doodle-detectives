@@ -6,6 +6,9 @@ const authController = require('../controllers/authController.js') //Handling us
 const path = require('path')
 //URL = PATH + /doodle/...
 
+
+router.get('/rules', controller.rules);
+
 //USER/AUTH ROUTES
 router.get('/lobby', 
 	authController.isLoggedIn, 

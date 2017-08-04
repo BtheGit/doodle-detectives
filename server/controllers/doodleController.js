@@ -15,6 +15,11 @@ exports.lobby = (req, res) => {
 	res.render('./doodle/lobby')
 }
 
+
+exports.rules = (req, res) => {
+	res.render('./doodle/rules')
+}
+
 //This is a hack to avoid the issue of improperly locating static resources because of 
 //different url structure for existing rooms
 exports.room = (req, res) => {

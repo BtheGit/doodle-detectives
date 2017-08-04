@@ -13,8 +13,6 @@ router.post('/login', authController.login);
 router.get('/logout', authController.logout);
 router.get('/register', userController.registerForm);
 
-router.get('/rules', userController.rules);
-
 router.post('/register',
 	//1) validate data
 	userController.validateRegister,

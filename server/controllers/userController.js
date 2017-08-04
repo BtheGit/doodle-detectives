@@ -15,10 +15,6 @@ exports.profile = (req, res) => {
 	res.render('./user/profile')
 }
 
-exports.rules = (req, res) => {
-	res.render('./user/rules')
-}
-
 exports.reset = (req, res) => {
 	//Show the reset form (after token is verified)
 	res.render('./user/reset')
