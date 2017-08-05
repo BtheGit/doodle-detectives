@@ -39,7 +39,7 @@ function doodle(io) {
 					}
 				});
 				//Initiate Packet Handlers
-				gameroomSocketHandlers(socket, client, session, gameSessionsMap);
+				gameroomSocketHandlers(socket, client, session, gameSessionsMap, activePlayersMap);
 				//Initialize session state
 				session.broadcastSessionState();
 			})
