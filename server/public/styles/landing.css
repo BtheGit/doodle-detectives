@@ -18,7 +18,7 @@ body {
 
 .menu-container-outer {
 	width: 40%;
-	height: 70%;
+	height: 100%;
 	display: flex;
 	justify-content: center;
 	align-items: center;
@@ -28,9 +28,7 @@ body {
 	position: relative;
 	width: 60%;
 	height: 90%;
-	/*background-color: rgba(50,50,50, 0.4);*/
 	background-color: #fff261;
-
 	border: 5px solid rgba(198,198,233, 0.1);
 	border-radius: 5px;
 	box-shadow: 0 19px 38px rgba(0,0,0,0.30), 0 15px 12px rgba(0,0,0,0.22);
@@ -40,6 +38,7 @@ body {
 .form-container {
 	width: 100%;
 	transition: all 600ms cubic-bezier(0, 0.88, 0.54, 1.17);
+	position: relative;
 }
 
 .form-container.hidden {
@@ -62,7 +61,7 @@ body {
 .form-container input {
 	text-align: left;
 	padding: 12px 5px;
-	margin-top: 20px;
+	margin-top: 10px;
 	width: 90%;
 	border: none;
 	border-radius: 3px;
@@ -77,7 +76,7 @@ body {
 	border: none;
 	font-size: 1.5em;
 	padding: 10px 5px;
-	margin-top: 20px;	
+	margin-top: 10px;	
 	width: 93%;
 	border-radius:3px;
 	color: #fff;
@@ -95,9 +94,8 @@ body {
 .message {
 	box-sizing: border-box;
 	padding: 0px 15px;
-	font-size: 16px;
 	cursor: default;
-	font-size: 1.1em;
+	font-size: .9em;
 	color: black;
 }
 
@@ -199,3 +197,35 @@ body {
 .menu-options div:hover a {
 	color: #970000;
 }
+
+.about-text {
+	position: absolute;
+	bottom: 0;
+	left: 10%;
+	width: 80%;
+	color: black;
+	font-size: 1.1em;
+}
+
+.about-text span {
+	font-weight: bolder;
+}
+
+@media (min-width: 1500px) {
+	.form-container input {
+		margin-top: 20px;
+	}
+
+	.form-container button { 
+		margin-top: 20px;	
+	}
+	
+	.message {
+		font-size: 1.1em;
+	}	
+
+	.about-text {
+		font-size: 1.3em;
+	}
+}
+

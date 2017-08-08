@@ -1,3 +1,7 @@
+* {
+	box-sizing: border-box;
+}
+
 html, body {
 	font-family:'Special Elite', cursive;
 	height: 100%;
@@ -53,7 +57,7 @@ body {
 .lobby-users-outer {
 	position: relative;
 	height: 100%;
-	width: 20%;
+	width: 25%;
 	margin: 0px 30px;
 	background: white;
 	border: 5px solid rgba(198,198,233, 0.2);
@@ -105,9 +109,8 @@ body {
 	height: 10%;
 	width: 100%;
 	text-align: center;
-	font-size: 1.8em;
+	font-size: 1.6em;
 	letter-spacing: 0.2em;
-	box-sizing: border-box;
 	margin: 0;
 	padding-top: 15px;
 	color: red;
@@ -118,9 +121,8 @@ body {
   color: #444;
 	background: linear-gradient(to top, #d9eaf3 0%, #fff 8%) 0 4px;
 	background-size: 100% 40px;
-
 	overflow-y: scroll;
-	box-sizing: border-box;
+	
 	padding: 10px;
 	width: 100%;
 	height: 90%;
@@ -166,11 +168,11 @@ body {
 }
 
 #menu-container::-webkit-scrollbar {
-    width: 1em;
+  width: 1em;
 }
  
 #menu-container::-webkit-scrollbar-track {
-    -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.3);
+  -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.3);
 }
  
 #menu-container::-webkit-scrollbar-thumb {
@@ -184,15 +186,13 @@ body {
   top: 0px;
   right: 0px;
   text-align: center;
-  /*display: flex;*/
-  /*justify-content: space-around;*/
 }
 
 .tabs div {
   width: 200px;
   height: 50px;
   text-align: center;
-  box-sizing: border-box;
+  
   border-radius: 6px 6px 0px 0px;
   padding-top: 10px;
   transform: translateY(-100%);
@@ -227,26 +227,25 @@ body {
 }
 
 .no-cases {
-	display: flex;
-	flex-direction: row;
-	margin: 10px;
-	align-items: center;
-	color: black;
-	box-sizing: border-box;
 	position: absolute;
-	font-size: 2.2em;
-	height: 3em;
-	width: 7em;
+	top: 35%;
+	left: 25%;
+	transform: rotate(-30deg);
+	margin: 10px;
+	height: 35%;
+	width: 50%;
 	border-radius: 50px;
 	border: 12px solid red;
 	color: red;
-	transform: translate(75%, 100%) rotate(-30deg);
+	font-size: 2.1em;
+	display: flex;
+	justify-content: center;
+	align-items: center;
 }
 
 .no-cases p {
-	width: 100%;
+	width: 80%;
 	text-align: center;
-	box-sizing: border-box;
 	padding-top: 10px;
 	margin: auto;
 }
@@ -282,7 +281,6 @@ body {
 
 .room-name {
 	width:60% ;
-	/*font-weight: bold;*/
 }
 
 
@@ -336,9 +334,8 @@ body {
 .action-button {
 	font-family: 'Arial';
 	position: absolute;
-	box-sizing: border-box;
-	/*left: calc(50% - 4.5em);*/
 	right: calc(0px - .75em);
+	bottom: calc(0px - .75em);
 	border-radius: 50%;
 	font-size: 6em;
 	width: 1.5em;
@@ -353,10 +350,7 @@ body {
 	background-color: #FFC000;
 	border-bottom: 5px solid #B99116;
 	text-shadow: 0px -2px #B99116;
-	transition: all 250ms ease-in-out;
-	-webkit-transition: all 0.1s;
-	transform-origin: 50% 300%;
-	transform: translateY(-50%);
+	transition: all 120ms ease-in-out;
 }
 
 .action-button:hover {
@@ -367,8 +361,7 @@ body {
 }
 
 .action-button:active {
-  -webkit-transform: translate(0px,5px);
-	transform: translateY(-45%);
+	transform: translateY(3%);
 	border-bottom: 1px solid;
 }
 
@@ -383,7 +376,6 @@ body {
 }
 
 .loading-rooms > span {
-	/*position: absolute;*/
 	display: inline-block;
 	animation-name: bounce;
 	animation-duration: 750ms;
@@ -404,15 +396,11 @@ body {
 		transform: translateY(0);
 	}
 
-	10% {
-		transform: translateY(0);
-	}
-
 	45% {
-		transform: translateY(-18px);
+		transform: translateY(-8px);
 	}
 
-	95% {
-		transform: translateY(2px);
+	85% {
+		transform: translateY(4px);
 	}
 }
