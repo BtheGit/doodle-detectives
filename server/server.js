@@ -14,7 +14,7 @@ const express 				= require('express'),
 			promisify 			= require('es6-promisify'),
 			ejs							= require('ejs')
 
-//DB STUFF 
+//#############  DATABASE ###########
 const mongoose = require('mongoose');
 const mongo_options = { 
 	server: { 
@@ -31,11 +31,10 @@ const mongo_options = {
   } 
 };       
 mongoose.connect(process.env.MONGODB_URI, mongo_options);
-mongoose.Promise = global.Promise;  // Tell Mongoose to use ES6 promises
+mongoose.Promise = global.Promise;  
 mongoose.connection.on('error', (err) => {
   console.error(`🙅 🚫 🙅 🚫 🙅 🚫 🙅 🚫 → ${err.message}`);
 });
-//Import database models
 require('./models/User');
 
 const sessionStore = new MongoStore({ mongooseConnection: mongoose.connection}) 
@@ -43,9 +42,10 @@ const sessionMiddleware = session({
 	secret: process.env.SECRET,
   saveUninitialized: false,
   resave: false,
-  store: sessionStore//using the already existing connection
+  store: sessionStore
 })
-//#######
+
+//#######################################
 
 const app = express();
 app.disable('x-powered-by');
@@ -57,9 +57,9 @@ app.set('view engine', 'ejs');
 
 app.use(express.static(__dirname + '/public'))
 app.use(cookieParser());
-app.use(bodyParser.json()); // handle json data
-app.use(bodyParser.urlencoded({ extended: true })); // handle URL-encoded data
-app.use(expressValidator()); // Exposes methods for validating data, mostly on userController.validateRegister
+app.use(bodyParser.json()); 
+app.use(bodyParser.urlencoded({ extended: true })); 
+app.use(expressValidator()); 
 
 app.use(sessionMiddleware);
 app.use(passport.initialize());
@@ -68,20 +68,18 @@ require('./config/passport.js')
 app.use(flash());
 
 app.use((req, res, next) => {
-  res.locals.flashes = req.flash(); //This gives us access to flash messages without refreshing
+  res.locals.flashes = req.flash(); 
   res.locals.user = req.user || null;
   res.locals.currentPath = req.path;
   next();
 });
 
-// promisify some callback based APIs
+// Promise > Callback !!
 app.use((req, res, next) => {
   req.login = promisify(req.login, req);
   next();
 });
 
-
-//#######
 
 const port = process.env.PORT || 8000;
 const server = app.listen(port, () => {
@@ -102,5 +100,4 @@ const ioSessionMiddleWare = {
 io.use(passportSocketIo.authorize(ioSessionMiddleWare))
 require('./components/lobby.js')(io)
 require('./components/doodle')(io) //Doodle Game Entry point
-
 app.use('/', require('./routes'))

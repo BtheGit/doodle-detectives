@@ -18,6 +18,7 @@ const user = new Schema({
 	name: {
 		type: String,
 		required: 'Please supply a name',
+		unique: true,
 		trim: true
 	},
 	resetPasswordToken: String,
