@@ -1,6 +1,4 @@
 require('dotenv').config({path: __dirname + './../.env'});
-//DATABASE=mongodb://fcc-admin:fcc-password@ds139242.mlab.com:39242/fcc_projects
-
 
 const express 				= require('express'),
 			bodyParser 			= require('body-parser'),
@@ -16,8 +14,6 @@ const express 				= require('express'),
 			promisify 			= require('es6-promisify'),
 			ejs							= require('ejs')
 
-
-			
 //DB STUFF 
 const mongoose = require('mongoose');
 const mongo_options = { 
@@ -92,9 +88,8 @@ const server = app.listen(port, () => {
 	console.log('Server started on port: ' + port)
 });
 
-//############## CUSTOM SESSIONS FOR SOCKET.IO GAME ###################
+//############## SOCKET.IO & GAME LOGIC ###################
 
-//Try and move this to another file entirely perhaps
 const io = require('socket.io')(server)
 const passportSocketIo = require('passport.socketio')
 const ioSessionMiddleWare = {
@@ -102,16 +97,8 @@ const ioSessionMiddleWare = {
 		key: 'connect.sid',
 		secret: process.env.SECRET,
 		store: sessionStore,
-		// success: onAuthorizeSuccess,
-		// fail: onAuthorizeFail
 }
-// function onAuthorizeSuccess(data, accept){
-// 	console.log('Connection succeeded')
-// }
-// function onAuthorizeFail(data, message, error, accept){
-// 	console.log('Connection failed')
-// 	console.log(message)
-// }
+
 io.use(passportSocketIo.authorize(ioSessionMiddleWare))
 require('./components/lobby.js')(io)
 require('./components/doodle')(io) //Doodle Game Entry point
