@@ -253,7 +253,6 @@ class Game {
 			//No further rounds necessary. The fake wins outright because he wasn't found 
 			//and gets points. All players and their colors be revealed.
 			this.isFakeWinner = true;
-			// this._emitFakeNotFoundEndGame();
 			this._concludeGame();
 		}
 		else {
