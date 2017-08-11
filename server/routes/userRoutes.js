@@ -11,7 +11,6 @@ router.get('/login', userController.loginForm);
 router.post('/login', authController.login);
 
 router.get('/logout', authController.logout);
-router.get('/register', userController.registerForm);
 
 router.post('/register',
 	//1) validate data

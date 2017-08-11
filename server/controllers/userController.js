@@ -7,10 +7,6 @@ exports.loginForm = (req, res) => {
 	res.render('./user/login')
 }
 
-exports.registerForm = (req, res) => {
-	res.render('./user/register')
-}
-
 exports.profile = (req, res) => {
 	res.render('./user/profile')
 }
