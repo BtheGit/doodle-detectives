@@ -10,6 +10,11 @@ html, body {
 	overflow: hidden;
 }
 
+img {
+	pointer-events: none;
+	user-select: none;
+}
+
 .container {
 	height: 100%;
 	width: 100%;
@@ -67,10 +72,8 @@ html, body {
 	left: 0;
 	box-shadow: 0px 0px 15px -1px #000 inset;
 	border-radius: 10px;
-
+	pointer-events: none;
 }
-
-
 
 .top {
 	width: 100%;
@@ -139,8 +142,6 @@ html, body {
 
 form * {
 	width: 90%;
-
-
 }
 
 .text div {
@@ -151,15 +152,34 @@ form * {
 
 input, button {
 	margin: auto;
-	background-color: #3f3f3f;
+	background-color: #FFCD96;
 	color: white;
 	height: 25px;
-	box-shadow: 0px 0px 15px -3px #000 inset;
+	border: none;
+}
+
+input:hover, button:hover {
+	filter: brightness(1.2);
+}
+
+button {
+	box-shadow: 0px 5px 20px -2px #000 ;
+	margin-bottom: 10px;
+	background-color: #FF8400;
+	text-shadow: 0px 0px 7px black;
+	text-transform: uppercase;
+}
+
+button:active {
+	box-shadow: 0px 2px 20px -2px #000 ;
 }
 
 input {
 	padding-left: 10px;
+	color: #414100;
+	box-shadow: 0px 0px 15px -3px #7D7D7D inset;
 }
+
 .photo {
 	height: 70%;
 	width: 35%;
