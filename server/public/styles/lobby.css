@@ -355,13 +355,13 @@ body {
 
 .action-button:hover {
 	box-shadow: 0px 0px 5px 0px black;
-	background-color: #FFA200;
 	border-bottom: 5px solid #D1A418;
-	transform: scale(1.2);
+	transform: scale(1.05);
+	filter: brightness(1.1);
 }
 
 .action-button:active {
-	transform: translateY(3%);
+	transform: scale(0.9);
 	border-bottom: 1px solid;
 }
 
