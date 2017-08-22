@@ -48,7 +48,7 @@ function doodle(io) {
 }
 
 
-//This should probably return the session that already exists instead of throwing an error?
+//TODO: This should probably return the session that already exists instead of throwing an error?
 function createGameSession(id) {
 	if(gameSessionsMap.has(id)){
 		throw new Error('Session already exists')

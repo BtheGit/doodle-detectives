@@ -1,7 +1,3 @@
-//Brainstorm secrets
-//ANIMALS: Monkey, Cheetah, Spider, Bee, Elephant
-//PEOPLE: Julius Caesar, Napoleon Bonaparte, Donald Trump, Charlie Chaplin
-
 const SECRETS = [
 	{
 		category: 'Animal',
@@ -13,7 +9,7 @@ const SECRETS = [
 	},
 	{
 		category: 'Food',
-		secret: 'Banana Split'
+		secret: 'Ice Cream'
 	},
 	{
 		category: 'Person',
@@ -49,10 +45,6 @@ const SECRETS = [
 	},
 	{
 		category: 'Halloween',
-		secret: 'Frankenstein'
-	},
-	{
-		category: 'Halloween',
 		secret: 'Zombie'
 	},
 	{
@@ -76,7 +68,7 @@ const SECRETS = [
 		secret: 'Monkey'
 	},
 	{
-		category: 'Food',
+		category: 'Fruit',
 		secret: 'Pineapple'
 	},
 	{
@@ -145,10 +137,6 @@ const SECRETS = [
 	},
 	{
 		category: 'Sports',
-		secret: 'Karate'
-	},
-	{
-		category: 'Sports',
 		secret: 'Sumo Wrestling'
 	},
 	{
@@ -160,12 +148,88 @@ const SECRETS = [
 		secret: 'Badminton'
 	},
 	{
-		category: 'Kitchen',
-		secret: 'Tea Kettle'
+		category: 'Animal',
+		secret: 'Starfish'		
 	},
 	{
-		category: 'Kitchen',
-		secret: 'Microwave'
+		category: 'Animal',
+		secret: 'Butterfly'		
+	},
+	{
+		category: 'Person',
+		secret: 'Donald Trump'		
+	},
+	{
+		category: 'Person',
+		secret: 'Michael Jackson'		
+	},
+	{
+		category: 'Food',
+		secret: 'Hot Dog'		
+	},
+	{
+		category: 'Food',
+		secret: 'Waffle'		
+	},
+	{
+		category: 'Profession',
+		secret: 'Detective'		
+	},
+	{
+		category: 'Profession',
+		secret: 'Doctor'		
+	},
+	{
+		category: 'Profession',
+		secret: 'Soldier'		
+	},
+	{
+		category: 'Vehicle',
+		secret: 'Submarine'		
+	},
+	{
+		category: 'Vehicle',
+		secret: 'Hot Air Balloon'		
+	},
+	{
+		category: 'Halloween',
+		secret: 'Vampire'		
+	},
+	{
+		category: 'Halloween',
+		secret: 'Ghost'		
+	},
+	{
+		category: 'Building',
+		secret: 'Igloo'		
+	},
+	{
+		category: 'Building',
+		secret: 'Church'		
+	},
+	{
+		category: 'Building',
+		secret: 'Castle'		
+	},
+	{
+		category: 'Fruit',
+		secret: 'Watermelon'		
+	},
+	{
+		category: 'Sports',
+		secret: 'Volleyball'		
+	},
+	{
+		category: 'Sports',
+		secret: 'Golf'		
+	},
+	{
+		category: 'Household Object',
+		secret: 'TV'		
+	},
+	{
+		category: 'Household Object',
+		secret: 'Fridge'		
 	}
 ];
 

@@ -53,6 +53,7 @@ class GameSession {
 	//VOTES TO BEGIN GAME
 	addVoteToBegin(client) {
 		this.votedToBegin.add(client)
+		this.broadcastSystemMessage(`${client.name.toUpperCase()} voted to start a new game.`)
 		this._updateVoteToBeginStatus();
 	}
 
@@ -76,17 +77,29 @@ class GameSession {
 	//!!!GAME Will initialize here when all votes have been collected.
 	_updateVoteToBeginStatus() {
 		if(this.currentSessionStatus !== GAMEACTIVE){
-			// if(this.clients.size === this.votedToBegin.length) {
-				//should be comparing elements not just size here in case one player goes and another comes
-				//lodash _.isEquals works
 			if(this.clients.size === this.votedToBegin.size) { 
-				this.currentSessionStatus = WAITINGTOSTART;
+				this.currentSessionStatus = WAITINGTOSTART; //TODO: Is this redundant?
 				this.initGame();
 			}
 			else {
 				this.currentSessionStatus = WAITINGFORPLAYERS;
 			}
 		}
+	}
+
+	broadcastSystemMessage(message) {
+		const clients = [...this.clients] || [];
+		clients.forEach(client => {
+			if(client.socket && client.socket.connected) {
+				client.send({
+					type: 'chat_message',
+					payload: {
+						time: Date.now(),
+						content: message
+					}
+				})
+			}
+		})			
 	}
 
 	broadcastSessionState() {
@@ -113,9 +126,6 @@ class GameSession {
 					type: 'session_state_update',
 					sessionState
 				})
-			}
-			else {
-				console.log('Couldn\'t send update. No socket available for', client.id)
 			}
 		})			
 	}
@@ -155,10 +165,8 @@ class GameSession {
 
 	//This is triggered in _updateVoteToBeginStatus() when all votes have been collected
 	initGame() {
-		// These paths are doodles in between game sessions
 		this.clearPaths();
 		this._emitGameWillStartAlert(); 
-		//This will flag the client to render the status bar differently
 		this.currentSessionStatus = GAMEACTIVE;
 		//Create a copy of players for the game to manipulate without affecting session members
 		const players = this._createPlayerList();
