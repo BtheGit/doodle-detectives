@@ -20,25 +20,35 @@ const gameroomSocketHandlers = (socket, client, session, gameSessionsMap, active
 			else if(packet.type === 'vote_to_begin') {
 				session.addVoteToBegin(client);
 			}
+			else if(packet.type === 'vote_to_reset') {
+				if(session.currentSessionStatus === 'GAMEACTIVE') {
+					session.addVoteToReset(client);
+				}
+			}
 			else if(packet.type === 'end_of_turn') {
-				session.nextTurn(client)
+				if(session.currentSessionStatus === 'GAMEACTIVE') {
+					session.nextTurn(client)
+				} 
 			}
 			else if(packet.type === 'vote_for_fake') {
-				console.log('Vote for fake received')
-				const vote = {
-					id: client.id,
-					vote: packet.vote
+				if(session.currentSessionStatus === 'GAMEACTIVE') {
+					console.log('Vote for fake received')
+					const vote = {
+						id: client.id,
+						vote: packet.vote
+					}
+					session.addVoteForFake(vote)		
 				}
-				session.addVoteForFake(vote)
 			}
 			else if (packet.type === 'fake_guess') {
-				//We want to send this guess out for approval (to allow for creative license in answering rather than strict
-				//syntax matching)
-				session.receiveFakeGuess(packet.guess)
+				if(session.currentSessionStatus === 'GAMEACTIVE') {
+					session.receiveFakeGuess(packet.guess)
+				}
 			}
 			else if (packet.type === 'guess_approval_vote') {
-				console.log('Received vote to approve guess of ', packet.vote)
-				session.receiveVoteToApproveGuess(client.id, packet.vote)
+				if(session.currentSessionStatus === 'GAMEACTIVE') {
+					session.receiveVoteToApproveGuess(client.id, packet.vote)
+				}
 			}
 		}
 	});

@@ -20,6 +20,7 @@ class GameSession {
 		this.id = id;
 		this.clients = new Set;
 		this.votedToBegin = new Set;
+		this.votedToReset = new Set;
 		this.chatLog = [];
 		this.paths = [];
 		this.currentSessionStatus = WAITINGFORPLAYERS;
@@ -50,7 +51,7 @@ class GameSession {
 		this.paths = [];
 	}
 
-	//VOTES TO BEGIN GAME
+	//############# VOTES TO BEGIN
 	addVoteToBegin(client) {
 		this.votedToBegin.add(client)
 		this.broadcastSystemMessage(`${client.name.toUpperCase()} voted to start a new game.`)
@@ -60,6 +61,58 @@ class GameSession {
 	removeVoteToBegin(client) {
 		this.votedToBegin.delete(client);
 		this._updateVoteToBeginStatus();
+	}
+
+	//GAME Will initialize here when all votes have been collected.
+	_updateVoteToBeginStatus() {
+		if(this.currentSessionStatus !== GAMEACTIVE){
+			if(this.clients.size === this.votedToBegin.size) { 
+				this.currentSessionStatus = WAITINGTOSTART; //TODO: Is this redundant?
+				this.initGame();
+			}
+			else {
+				this.currentSessionStatus = WAITINGFORPLAYERS;
+			}
+		}
+	}
+
+	//############# HARD RESET LOGIC
+	
+	/**
+	 * Players are able to vote to reset at any time. There are checks clientside to prevent sending the vote when
+	 * a game is not active. This is a secondary security measure. Votes will act as a toggle, allowing players
+	 * to cancel their vote with impunity. 
+	 * @param {Object} client 
+	 */
+	addVoteToReset(client) {
+		if(this.currentSessionStatus === GAMEACTIVE){
+			if(!this.votedToReset.has(client)) {
+				this.votedToReset.add(client);
+				this.broadcastSystemMessage(`${client.name.toUpperCase()} voted to reset the game.`)	;	
+				this._updateVoteToResetStatus();
+			}
+			else {
+				this.removeVoteToReset(client);
+			}
+		}
+	}
+
+	removeVoteToReset(client) {
+		this.votedToReset.delete(client);
+		this.broadcastSystemMessage(`${client.name.toUpperCase()} cancelled their vote to reset.`);
+		this._updateVoteToResetStatus();
+	}
+
+	/**
+	 * If at least half the clients in the room are currently voting to end the game, a reset will be triggered
+	 * 
+	 */
+	_updateVoteToResetStatus() {
+		if(this.votedToReset.size >= Math.ceil(this.clients.size / 2)) {
+			this.broadcastSystemMessage('--Game cancelled by player vote--');
+			this.resetSessionStatusAfterGame();
+			this.broadcastHardReset();
+		}
 	}
 
 	/**
@@ -74,17 +127,15 @@ class GameSession {
 		this.game.addVoteToApproveGuess(client, vote)
 	}
 
-	//!!!GAME Will initialize here when all votes have been collected.
-	_updateVoteToBeginStatus() {
-		if(this.currentSessionStatus !== GAMEACTIVE){
-			if(this.clients.size === this.votedToBegin.size) { 
-				this.currentSessionStatus = WAITINGTOSTART; //TODO: Is this redundant?
-				this.initGame();
+	broadcastHardReset() {
+		const clients = [...this.clients] || [];
+		clients.forEach(client => {
+			if(client.socket && client.socket.connected) {
+				client.send({
+					type: 'hard_reset'
+				})
 			}
-			else {
-				this.currentSessionStatus = WAITINGFORPLAYERS;
-			}
-		}
+		})				
 	}
 
 	broadcastSystemMessage(message) {
@@ -113,13 +164,11 @@ class GameSession {
 			}
 		});
 
-		//This structure needs to match the client exactly since I'm just copying the object straight into updates
 		const sessionState = {
 			players,
 			currentSessionStatus: this.currentSessionStatus
 		}
 
-		//Broadcast state to every player
 		clients.forEach(client => {
 			if(client.socket && client.socket.connected) {
 				client.send({
@@ -151,16 +200,20 @@ class GameSession {
 
 	leave(client) {
 		if(client.session !== this) {
-			throw new Error('Client not in session')
+			throw new Error('Client not in session');
 		}
 		//If they have already voted to start game we want to remove that vote
 		if(this.votedToBegin.has(client)) {
 			this.removeVoteToBegin(client);
 		}
 
-		this.clients.delete(client)
+		if(this.votedToReset.has(client)) {
+			this.removeVoteToReset(client);
+		}
+
+		this.clients.delete(client);
 		client.session = null;
-		this._checkPlayerQuotas()
+		this._checkPlayerQuotas();
 	}
 
 	//This is triggered in _updateVoteToBeginStatus() when all votes have been collected
@@ -193,8 +246,8 @@ class GameSession {
 		this.game.receiveFakeGuess(guess);
 	}
 
-
 	resetSessionStatusAfterGame() {
+		this.votedToReset = new Set;
 		this.votedToBegin = new Set;
 		this.currentSessionStatus = WAITINGTOSTART;
 		this._checkPlayerQuotas();
