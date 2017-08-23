@@ -1,6 +1,6 @@
 const SECRETS = require('../../TEMPdb/secretsDB.js'),
 			COLORS = require('../../TEMPdb/colorsDB.js'),
-			{ shuffleArray } = require('./gameroomHelpers.js')
+			{ shuffleArray, generateRandomId } = require('./gameroomHelpers.js')
 
 
 
@@ -81,7 +81,12 @@ class Game {
 	};
 
 	_createTurnList(players) {
-		const playerTurns = [...players, ...players];
+		let playerTurns = [...players, ...players];
+		//Each turn will be given a unique Id that the server can use to override lapsed timers and avoid conflicts
+		playerTurns = playerTurns.map(turn => {
+			turn.turnId = generateRandomId(10)
+			return turn
+		})
 		return playerTurns;
 	};
 
@@ -103,11 +108,12 @@ class Game {
 		this.state.currentPhase = DISPLAYSECRET;
 		this._displaySecret(this.state.secret);
 		console.log('Starting first turn');
-		//In the real game give them 10-15 seconds with the secret to process.
+
+		//Players have 10 seconds to prepare before the drawing phase starts
 		setTimeout(() => {
 			this.state.currentPhase = DRAWING;
 			this.nextTurn()
-		}, 12000);
+		}, 10000);
 	};
 
 	//############ EMITTERS ###############
@@ -117,7 +123,6 @@ class Game {
 		players.forEach(player => {
 			playerColors[player.id] = player.color;
 		})
-		console.log(playerColors)
 		const packet = {
 			type: 'update_player_colors',
 			playerColors
@@ -149,13 +154,14 @@ class Game {
 
 	_broadcastTurn(turn) {
 		this.state.playerList.map(player => {
+			const isActive = player.id === turn.id;
 			const packet = {
 				type: 'next_turn',
 				payload: {
-					active: player.id === turn.id,
-					color: turn.color,
+					active: isActive,
 					name: turn.name,
-					id: turn.id
+					id: turn.id,
+					turnId: turn.turnId
 				}
 			};
 			player.socket.emit('packet', packet);
@@ -296,7 +302,7 @@ class Game {
 	 * @param  {Array} Objects representing each turn (which player information)
 	 */
 	nextTurn() {
-		const turns = this.state.turnList;
+		const turns = this.state.turnList
 		if (!turns.length) {
 			this._initiateFakeVoteSequence()
 		}

@@ -25,7 +25,6 @@ class GameSession {
 		this.paths = [];
 		this.currentSessionStatus = WAITINGFORPLAYERS;
 		this.game = null;
-		// setTimeout(() => this.initGame(), 15000)
 		// this.usedSecrets = [] //figure out the best way to track variables like secrets/scores between games
 	}
 
@@ -234,10 +233,10 @@ class GameSession {
 	 * active player, to avoid cheating.
 	 * @param  {Object} client [Gives us access to the id of the active player] 
 	 */
-	nextTurn(client) {
+	nextTurn(client, turnId) {
 		console.log('next turn request', client.id) //For testing REMOVE
 		const curTurn = this.game.retrieveState().currentTurn
-		if(curTurn.id === client.id) {
+		if(curTurn.id === client.id && curTurn.turnId === turnId) {
 			this.game.nextTurn()
 		}
 	}

@@ -27,7 +27,7 @@ const gameroomSocketHandlers = (socket, client, session, gameSessionsMap, active
 			}
 			else if(packet.type === 'end_of_turn') {
 				if(session.currentSessionStatus === 'GAMEACTIVE') {
-					session.nextTurn(client)
+					session.nextTurn(client, packet.turnId)
 				} 
 			}
 			else if(packet.type === 'vote_for_fake') {
