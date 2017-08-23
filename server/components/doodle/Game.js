@@ -29,6 +29,7 @@ class Game {
 			},
 			turnList: null, //{id, name, socket, color, isFake}
 			currentTurn: null,
+			currentTurnTimeout: null,
 			fakeGuess: ''
 		};
 		this.fakePlayer = null;
@@ -304,11 +305,30 @@ class Game {
 	nextTurn() {
 		const turns = this.state.turnList
 		if (!turns.length) {
-			this._initiateFakeVoteSequence()
+			clearTimeout(this.state.currentTurnTimeout)
+			this._initiateFakeVoteSequence();
 		}
 		else {
 			this.state.currentTurn = turns.shift();
-			this._broadcastTurn(this.state.currentTurn)
+			this._broadcastTurn(this.state.currentTurn);
+			this._startNextTurnTimer(this.state.currentTurn.turnId);
+		}
+	}
+
+	_startNextTurnTimer(turnId) {
+		clearTimeout(this.state.currentTurnTimeout)
+		this.state.currentTurnTimeout = setTimeout(() => this._endTurnTimer(turnId), 17000);
+	}
+
+	/**
+	 * Check if the previous turn is still active (ie the client doesn't have their tab open) and if so
+	 * force end the turn.
+	 * @param  {String} turnId [unique id used to compare turns against each other]
+	 * 
+	 */
+	_endTurnTimer(turnId) {
+		if(turnId === this.state.currentTurn.turnId && this.state.currentPhase === DRAWING) {
+			this.nextTurn();
 		}
 	}
 
