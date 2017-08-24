@@ -15,6 +15,14 @@ const GAMEACTIVE        = 'GAMEACTIVE',
       WAITINGTOSTART    = 'WAITINGTOSTART',
       WAITINGFORPLAYERS = 'WAITINGFORPLAYERS';
 
+//Game phase constants used in state updates to client to control flow
+const DISPLAYSECRET = 'DISPLAYSECRET',
+			DRAWING 			= 'DRAWING',
+			FAKEVOTE 			= 'FAKEVOTE',
+			GUESSVOTE 		= 'GUESSVOTE',
+			GAMEOVER 			= 'GAMEOVER';
+
+
 class GameSession {
 	constructor(id) {
 		this.id = id;
@@ -25,6 +33,9 @@ class GameSession {
 		this.paths = [];
 		this.currentSessionStatus = WAITINGFORPLAYERS;
 		this.game = null;
+		//gameClientSet will be used for reconnecting player verifications
+		this.gameClientSet = null;
+
 		// this.usedSecrets = [] //figure out the best way to track variables like secrets/scores between games
 	}
 
@@ -178,6 +189,51 @@ class GameSession {
 		})			
 	}
 
+	_emitReconnectStateDump(client, gameState) {
+		console.log('Emitting reconnect State Dump')
+		const { currentPhase } = gameState;
+		const isFake = gameState.fakePlayer.dbId === client.dbId;
+		const secret = {
+			category: gameState.secret.category,
+			secret: isFake ? 'XXX' : gameState.secret.secret
+		};
+		const playerColors = {}
+		gameState.playerList.forEach(player => {
+			playerColors[player.id] = player.color;
+		})
+
+		//This is what I will switch to later
+		// const currentPlayerId = gameState.currentTurn.id; 
+
+		//Create a packet with:
+		//gamephase, color, category, secret, isFake, currentPlayer, isMyTurn, 
+		//playerColors object,
+		//##if it is myTurn we'll have to manually set the timer to match the server
+		//##(come back to that later. For now the player should just be able to
+		//##draw until the server override)
+		//
+		//For now, the level of complexity with reconnecting during various votes is
+		//a bit harder. We'll stick to just the drawing phase at the moment.
+		const statePacket = {
+			currentPhase,
+			isFake,
+			secret,
+			playerColors
+		}
+		console.log('GameState Packet', statePacket)
+
+		//We'll have to set specific updates based on phase
+		if(currentPhase === DRAWING) {
+			const isMyTurn = gameState.currentTurn.dbId === client.dbId;
+			const currentPlayerName = gameState.currentTurn.name;
+			const drawingPacket = {
+				isMyTurn,
+				currentPlayerName
+			}
+		}
+	}
+
+	//TODO rename broadcast
 	_emitGameWillStartAlert() {
 		const clients = [...this.clients] || []; 
 		clients.forEach( client => {
@@ -187,6 +243,28 @@ class GameSession {
 		})	
 	}
 
+	reJoinClient(client) {
+		//If a player is already in the gameClientSet (ie reconnecting)
+		//Broadcast a full state dump and tell the client to resume
+		if(this.gameClientSet.has(client.dbId)) {
+			console.log('Client detected in active game')
+			//Get player from game list
+			const gameState = this.game.retrieveState()
+			this.game.updatePlayerSocket(client) //give game access to new socket
+			const oldClient = gameState.playerList.find(player => player.dbId === client.dbId)
+			client.id = oldClient.id
+			console.log('OldClient', oldClient.id, oldClient.socket.id)
+			console.log('Client', client.id, client.socket.id)
+			//TODO: Make sure client socket that game accesses is updated to new socket
+			//eg this.game.playerList[x].socket = client.socket
+			//Also set old id back eg client.id = this.game.playerList[x].id
+			//then broadcast a player color update (reuse from this.game)
+			this._emitReconnectStateDump(client, gameState)
+		}
+		//Else set them as a spectator (might not have to do anything server side)
+	//TODO: Broadcast paths and chat logs too
+	}
+
 	//TODO: make sure a maximum of 8 can join room
 	join(client) {
 		if(client.session) {
@@ -194,7 +272,7 @@ class GameSession {
 		}
 		this.clients.add(client);
 		client.session = this;
-		this._checkPlayerQuotas()
+		this._checkPlayerQuotas();
 	}
 
 	leave(client) {
@@ -222,6 +300,8 @@ class GameSession {
 		this.currentSessionStatus = GAMEACTIVE;
 		//Create a copy of players for the game to manipulate without affecting session members
 		const players = this._createPlayerList();
+		//The set will be used during the current game for player reconnects
+		this.gameClientSet = this._createGameClientSet(players);
 		//Games will not be recycled. Each game will be a new instance.
 		this.game = new Game(this, players)
 		this.broadcastSessionState();
@@ -231,6 +311,7 @@ class GameSession {
 	 * This function will direct the active game to advance to the next turn. It's
 	 * primary function is to ensure that the command to advance comes from the currently
 	 * active player, to avoid cheating.
+	 * 
 	 * @param  {Object} client [Gives us access to the id of the active player] 
 	 */
 	nextTurn(client, turnId) {
@@ -246,11 +327,25 @@ class GameSession {
 	}
 
 	resetSessionStatusAfterGame() {
+		this.game = null;
+		this.gameClientSet = null;
 		this.votedToReset = new Set;
 		this.votedToBegin = new Set;
 		this.currentSessionStatus = WAITINGTOSTART;
 		this._checkPlayerQuotas();
 		this.broadcastSessionState();
+	}
+
+	/**
+	 * A set of User Ids (equal to database id) that are built before each game
+	 * and not changed. At the end of every game they will be set back to null.
+	 * 
+	 * @param  {Array} players 				[The array of players also used to pass to game session]
+	 * @return {Set}  gameClientSet   [A set of Strings]
+	 */
+	_createGameClientSet(players) {
+		players = players.map(player => player.dbId)
+		return new Set(players);
 	}
 
 	//This will be the player list that the Game instance manipulates and broadcasts to. 
@@ -260,6 +355,7 @@ class GameSession {
 		let players = Array.from(this.clients);
 		players = players.map(player => {
 			return {
+				dbId: player.dbId,
 				id: player.id,
 				name: player.name,
 				socket: player.socket,

@@ -27,16 +27,24 @@ function doodle(io) {
 				//communication during game
 				client.socket = socket
 				session = client.session
-				client.send({
-					type: 'setup_client',
-					payload: {
+
+				//HERE IS WHERE WE SHOULD TRIGGER THE REJOIN LOGIC SO WE HAVE THE SOCKET
+				//TO WORK WITH
+				if(session.currentSessionStatus === 'GAMEACTIVE') {
+					session.reJoinClient(client)
+				}
+
+				const payload = {
 					  sessionId: session.id,
 					  clientId: client.id,
 					  clientName: client.name,
 					  color: generateRandomColor(),
 					  chatLog: session.getChatLog(),
 					  paths: session.getPaths()
-					}
+				}
+				client.send({
+					type: 'setup_client',
+					payload 
 				});
 				//Initiate Packet Handlers
 				gameroomSocketHandlers(socket, client, session, gameSessionsMap, activePlayersMap);

@@ -30,9 +30,9 @@ class Game {
 			turnList: null, //{id, name, socket, color, isFake}
 			currentTurn: null,
 			currentTurnTimeout: null,
-			fakeGuess: ''
+			fakeGuess: '',
+			fakePlayer: null
 		};
-		this.fakePlayer = null;
 		this.fakeVotes = new Set;
 		this.votesToApprove = new Map;
 		this.isFakeWinner = false;
@@ -40,7 +40,7 @@ class Game {
 
 		//Basic Setup
 		this.state.playerList = this._setupPlayers(players);
-		this._updatePlayerColors(this.state.playerList);
+		this._emitPlayersColorUpdate(this.state.playerList);
 		this.state.turnList = this._createTurnList(this.state.playerList);
 		this.state.secret = this._generateSecret(SECRETS);
 
@@ -57,7 +57,7 @@ class Game {
 	 */
 	_setFakePlayer(players) {
 		const fake = players[Math.floor(Math.random() * players.length)];
-		this.fakePlayer = fake;
+		this.state.fakePlayer = fake;
 		players = players.map(player => {
 			const isFake = player.id === fake.id ? true : false;
 			return Object.assign({}, player, {isFake});
@@ -85,7 +85,7 @@ class Game {
 		let playerTurns = [...players, ...players];
 		//Each turn will be given a unique Id that the server can use to override lapsed timers and avoid conflicts
 		playerTurns = playerTurns.map(turn => {
-			turn.turnId = generateRandomId(10)
+			turn = Object.assign({}, turn, {turnId: generateRandomId(10)})
 			return turn
 		})
 		return playerTurns;
@@ -119,7 +119,7 @@ class Game {
 
 	//############ EMITTERS ###############
 	//
-	_updatePlayerColors(players) {
+	_emitPlayersColorUpdate(players) {
 		const playerColors = {};
 		players.forEach(player => {
 			playerColors[player.id] = player.color;
@@ -236,7 +236,7 @@ class Game {
 		let isTie = false;
 		let fakeNotFound = false;
 		//We have to do this because at the moment the fakePlayer is stored before its color is assigned
-		this.fakePlayer = this.state.playerList.filter(player => player.id === this.fakePlayer.id)[0];
+		this.state.fakePlayer = this.state.playerList.filter(player => player.id === this.state.fakePlayer.id)[0];
 		this.fakeVotes.forEach(player => {
 			tally[player.vote] = tally.hasOwnProperty(player.vote) ? tally[player.vote] + 1 : 1;
 		})
@@ -253,7 +253,7 @@ class Game {
 				fakeNotFound = true;
 			}
 		}
-		if(tallyArr[0].color !== this.fakePlayer.color) {
+		if(tallyArr[0].color !== this.state.fakePlayer.color) {
 			fakeNotFound = true;
 		}
 		if(fakeNotFound) {
@@ -269,7 +269,6 @@ class Game {
 	}
 
 	_tallyApprovalVotes() {
-		console.log('Tallying Approval Votes')
 		//If there are a majority of votes approving (ties lose) the guess than the fake steals the win
 		const totalVotes = this.votesToApprove.size;
 		let yesVotes = 0;
@@ -333,17 +332,13 @@ class Game {
 	}
 
 	addVoteForFake(vote) {
-		//TODO Check if set already has client ID (double check for no double voting). Can do with Map as below.
 		this.fakeVotes.add(vote)
-		//Check if all votes are received and tally
 		if(this.fakeVotes.size === this.state.playerList.length) {
 			this._tallyFakeVotes()
 		}
 	}
 
 	addVoteToApproveGuess(client, vote) {
-		console.log('Adding vote to approve guess', client, vote)
-		//Check to make sure the client isn't voting more than once
 		if(!this.votesToApprove.has(client)) {
 			this.votesToApprove.set(client, vote)
 		}
@@ -353,9 +348,16 @@ class Game {
 	}
 
 	receiveFakeGuess(guess) {
-		console.log('Fake guess received: ', guess)
 		this.state.fakeGuess = guess;
 		this._emitFakeGuessForApproval(guess);
+	}
+
+	updatePlayerSocket(client) {
+		this.state.playerList.map(player => {
+			if(player.dbId === client.dbId) {
+				player.socket = client.socket;
+			}
+		})
 	}
 
 }

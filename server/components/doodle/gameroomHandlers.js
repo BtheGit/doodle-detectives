@@ -32,7 +32,6 @@ const gameroomSocketHandlers = (socket, client, session, gameSessionsMap, active
 			}
 			else if(packet.type === 'vote_for_fake') {
 				if(session.currentSessionStatus === 'GAMEACTIVE') {
-					console.log('Vote for fake received')
 					const vote = {
 						id: client.id,
 						vote: packet.vote
