@@ -40,6 +40,11 @@ class GameSession {
 	}
 
 	//CHAT LOG
+	
+	/**
+	 * Add a new entry to the array of chat messages
+	 * @param {Object} msg [Properties: Time, Content, [Name: if sent by user]]
+	 */
 	addChatMessage(msg) {
 		this.chatLog = [...this.chatLog, msg];
 	}
@@ -115,7 +120,7 @@ class GameSession {
 
 	/**
 	 * If at least half the clients in the room are currently voting to end the game, a reset will be triggered
-	 * 
+	 * (TODO: check only clients who are also active players)
 	 */
 	_updateVoteToResetStatus() {
 		if(this.votedToReset.size >= Math.ceil(this.clients.size / 2)) {
@@ -149,6 +154,7 @@ class GameSession {
 	}
 
 	broadcastSystemMessage(message) {
+		this.addChatMessage({time: Date.now(), content: message})
 		const clients = [...this.clients] || [];
 		clients.forEach(client => {
 			if(client.socket && client.socket.connected) {

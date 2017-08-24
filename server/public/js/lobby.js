@@ -7,7 +7,7 @@ let menuUpdateHandler;
 const socket = io.connect('/lobby')
 socket.on('connect', () => {
   console.log('Connected to server')
-  menuUpdateHandler = setInterval(reqUpdates, 1000);
+  menuUpdateHandler = setInterval(reqUpdates, 2000);
 })
 socket.on('disconnected', () => {
   clearInterval(menuUpdateHandler);
@@ -27,6 +27,7 @@ function reqUpdates() {
   socket.emit('reqUpdate');
 }
 
+
 /**
  * Manually update container div with formatted rooms list
  * @param  {Array} roomsList [Array of Objects containing sessionId, clients, size]
@@ -38,7 +39,7 @@ function updateRoomsMenu(array = []) {
     for (let i = 0; i < array.length; i++) {
       const link = array[i].pop >= 8 
         ? `<p class="room-button full-button">ROOM FULL</p>` 
-        : `<a class="room-button join-button" href="/doodle/room/${array[i].sessionId}">JOIN</a>`
+        : `<a class="room-button join-button" href="/doodle/room/${array[i].sessionId}" onClick="this.href=''">JOIN</a>`
       const room =
          `<div class="room-container">
           <div class="room-name">

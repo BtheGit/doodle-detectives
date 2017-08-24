@@ -3,7 +3,7 @@ html, body {
 	width: 100%;
 	margin: 0;
 	padding: 0;
-	background: radial-gradient(#232D2C 30%,#1E1E1F);
+	background: radial-gradient(circle, #4F6260 10%,#0E0E0E);
 	overflow: hidden;
 }
 
@@ -13,7 +13,7 @@ html, body {
 
 .container {
 	font-family: 'Special Elite', cursive;
-	font-size: 24px;
+	font-size: 2.5vmin;
 	line-height: 1.5em;
 	margin: 0 auto;
 	max-width: 800px;
