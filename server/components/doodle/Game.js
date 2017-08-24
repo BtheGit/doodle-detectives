@@ -40,7 +40,7 @@ class Game {
 
 		//Basic Setup
 		this.state.playerList = this._setupPlayers(players);
-		this._emitPlayersColorUpdate(this.state.playerList);
+		this.emitPlayersColorUpdate(this.state.playerList);
 		this.state.turnList = this._createTurnList(this.state.playerList);
 		this.state.secret = this._generateSecret(SECRETS);
 
@@ -119,7 +119,7 @@ class Game {
 
 	//############ EMITTERS ###############
 	//
-	_emitPlayersColorUpdate(players) {
+	emitPlayersColorUpdate(players) {
 		const playerColors = {};
 		players.forEach(player => {
 			playerColors[player.id] = player.color;

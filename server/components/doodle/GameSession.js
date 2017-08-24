@@ -197,10 +197,6 @@ class GameSession {
 			category: gameState.secret.category,
 			secret: isFake ? 'XXX' : gameState.secret.secret
 		};
-		const playerColors = {}
-		gameState.playerList.forEach(player => {
-			playerColors[player.id] = player.color;
-		})
 
 		//This is what I will switch to later
 		// const currentPlayerId = gameState.currentTurn.id; 
@@ -214,23 +210,22 @@ class GameSession {
 		//
 		//For now, the level of complexity with reconnecting during various votes is
 		//a bit harder. We'll stick to just the drawing phase at the moment.
-		const statePacket = {
+		const packet = {
 			currentPhase,
 			isFake,
 			secret,
-			playerColors
 		}
-		console.log('GameState Packet', statePacket)
 
 		//We'll have to set specific updates based on phase
 		if(currentPhase === DRAWING) {
-			const isMyTurn = gameState.currentTurn.dbId === client.dbId;
-			const currentPlayerName = gameState.currentTurn.name;
-			const drawingPacket = {
-				isMyTurn,
-				currentPlayerName
-			}
+			packet.isMyTurn = gameState.currentTurn.dbId === client.dbId;
+			packet.currentPlayerName = gameState.currentTurn.name;
 		}
+
+		client.socket.emit('packet', {
+			type: 'reconnect_player',
+			payload: packet
+		})
 	}
 
 	//TODO rename broadcast
@@ -248,17 +243,12 @@ class GameSession {
 		//Broadcast a full state dump and tell the client to resume
 		if(this.gameClientSet.has(client.dbId)) {
 			console.log('Client detected in active game')
-			//Get player from game list
+
 			const gameState = this.game.retrieveState()
 			this.game.updatePlayerSocket(client) //give game access to new socket
 			const oldClient = gameState.playerList.find(player => player.dbId === client.dbId)
 			client.id = oldClient.id
-			console.log('OldClient', oldClient.id, oldClient.socket.id)
-			console.log('Client', client.id, client.socket.id)
-			//TODO: Make sure client socket that game accesses is updated to new socket
-			//eg this.game.playerList[x].socket = client.socket
-			//Also set old id back eg client.id = this.game.playerList[x].id
-			//then broadcast a player color update (reuse from this.game)
+			this.game.emitPlayersColorUpdate(gameState.playerList)
 			this._emitReconnectStateDump(client, gameState)
 		}
 		//Else set them as a spectator (might not have to do anything server side)
