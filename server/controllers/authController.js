@@ -12,7 +12,8 @@ exports.isLoggedIn = (req, res, next) => {
 	if(req.isAuthenticated()) return next();
 	//Flash failure and return to login
 	req.flash('error', 'Oops you must be logged in to do that!');
-	res.redirect('/');
+	res.render('index', {locals: {flashes: req.flash()}})
+	// res.redirect('/');
 }
 
 exports.confirmedPasswords = (req, res, next) => {
@@ -43,7 +44,7 @@ exports.verifyToken = async (req, res, next) => {
 exports.login = passport.authenticate('local', {
 	failureRedirect: '/',
 	failureFlash: 'Failed Login!',
-	successRedirect: '/',
+	successRedirect: '/doodle/lobby',
 	successFlash: 'Logged in.'
 })
 

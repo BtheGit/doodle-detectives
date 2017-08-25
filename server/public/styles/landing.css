@@ -5,11 +5,13 @@ html, body {
 	margin: 0;
 	padding: 0;
 	background: black;
+	user-select: none;
 }
 
 body {
-	background: radial-gradient(#232D2C 30%,#1E1E1F);
-	background: url('/images/dd-bg4.jpg') no-repeat center center fixed;
+	background: radial-gradient(#4F6260 5%,#0E0E0E);
+	/*background: radial-gradient(#232D2C 30%,#1E1E1F);*/
+	/*background: url('/images/dd-bg4.jpg') no-repeat center center fixed;*/
 	background-size: cover;
 	display: flex;
 	justify-content: flex-end;

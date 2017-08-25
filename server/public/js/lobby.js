@@ -39,7 +39,7 @@ function updateRoomsMenu(array = []) {
     for (let i = 0; i < array.length; i++) {
       const link = array[i].pop >= 8 
         ? `<p class="room-button full-button">ROOM FULL</p>` 
-        : `<a class="room-button join-button" href="/doodle/room/${array[i].sessionId}" onClick="this.href=''">JOIN</a>`
+        : `<a class="room-button join-button" href="/doodle/room/${array[i].sessionId}" >JOIN</a>`
       const room =
          `<div class="room-container">
           <div class="room-name">
