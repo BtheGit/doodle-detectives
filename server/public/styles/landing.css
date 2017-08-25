@@ -6,16 +6,67 @@ html, body {
 	padding: 0;
 	background: black;
 	user-select: none;
+	overflow: hidden;
 }
 
 body {
 	background: radial-gradient(#4F6260 5%,#0E0E0E);
 	/*background: radial-gradient(#232D2C 30%,#1E1E1F);*/
-	/*background: url('/images/dd-bg4.jpg') no-repeat center center fixed;*/
 	background-size: cover;
 	display: flex;
 	justify-content: flex-end;
 	align-items: flex-end;
+}
+
+.polaroid {
+	position: absolute;
+	height: 515px;
+	width: 440px;
+	background-color: white;
+	box-shadow: 0px 0px 5px 0px #222, 0px 10px 15px -5px black;
+}
+
+.polaroid-inner {
+	position: absolute;
+	height: 78%;
+	width: 94%;
+	top: 3%;
+	left: 3%;
+	box-shadow: 0px 0px 10px -3px black inset;
+	background-color: black;
+}
+
+.polaroid:nth-of-type(1) {
+	top: calc(55% - 250px);
+	left: calc(25% - 250px);
+	transform: rotate(-45deg);
+}
+
+.polaroid:nth-of-type(2) {
+	top: calc(40% - 250px);
+	left: calc(35% - 250px);
+	transform: rotate(-4deg);
+}
+
+.polaroid:nth-of-type(3) {
+	top: calc(55% - 250px);
+	left: calc(48% - 250px);
+	transform: rotate(8deg);
+}
+
+.polaroid:nth-of-type(1) .polaroid-inner {
+	background: url('/images/splatter.png') no-repeat;
+	background-color:#AC0D0D;
+	background-size: cover;
+}
+.polaroid:nth-of-type(2) .polaroid-inner {
+	background: url('/images/fake.png') no-repeat;
+	background-color:#0E3B4C;
+	background-size: cover;
+}
+.polaroid:nth-of-type(3) .polaroid-inner {
+	background: url('/images/polaroid1.jpg') no-repeat;
+	background-size: cover;
 }
 
 .menu-container-outer {

@@ -1,8 +1,11 @@
 'use strict'
 
 const menuContainer = document.getElementById('menu-container'); 
-const usersContainer = document.getElementById('lobby-users-list')
+const usersContainer = document.getElementById('lobby-users-list');
+const actionButton = document.getElementById('action');
 let menuUpdateHandler;
+
+actionButton.addEventListener('click', () => {actionButton.classList.add('spin-away')})
 
 const socket = io.connect('/lobby')
 socket.on('connect', () => {

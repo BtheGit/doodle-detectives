@@ -11,9 +11,6 @@
 
     <div class="header-container">
       Doodle
-<!--       <div class="logo-image">
-        <img src="/images/title2.png">
-      </div> -->
     </div>
     <div class="container">
       <div class="lobby-users-outer">
@@ -25,17 +22,21 @@
       </div>
       <div class="button-container">
         <div class="tabs">
+          <div><a href="/user/logout">Logout</a></div>
           <div><a href="/user/profile">Profile</a></div>
-          <div><a href="/user/logout">Logout</a></div> 
+          <div><a href="/doodle/rules">How To Play</a></div> 
         </div>
         <div id="menu-container">
           <div class="loading-rooms">Loading <span>.</span> <span>.</span> <span>.</span></div>
         </div>
-        <a href="/doodle/room" class="action-button"></a>
+        <div class="new-game-container">
+          <div class="arrow">NEW GAME</div>
+          <a href="/doodle/room" id="action" class="action-button"></a>
+        </div>
       </div>
     </div>
     <div class="footer-container">
-    Detectives
+      Detectives
     </div>
     <script src="/socket.io/socket.io.js"></script>
     <script src="/js/lobby.js"></script>
