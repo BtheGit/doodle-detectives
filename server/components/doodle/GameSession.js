@@ -248,14 +248,13 @@ class GameSession {
 		//If a player is already in the gameClientSet (ie reconnecting)
 		//Broadcast a full state dump and tell the client to resume
 		if(this.gameClientSet.has(client.dbId)) {
-			console.log('Client detected in active game')
-
-			const gameState = this.game.retrieveState()
-			this.game.updatePlayerSocket(client) //give game access to new socket
-			const oldClient = gameState.playerList.find(player => player.dbId === client.dbId)
-			client.id = oldClient.id
-			this.game.emitPlayersColorUpdate(gameState.playerList)
-			this._emitReconnectStateDump(client, gameState)
+			console.log('Client detected in active game');
+			const gameState = this.game.retrieveState();
+			this.game.updatePlayerSocket(client); //give game access to new socket
+			const oldClient = gameState.playerList.find(player => player.dbId === client.dbId);
+			[client.id, client.color] = [oldClient.id, oldClient.color];
+			this.game.emitPlayersColorUpdate(gameState.playerList);
+			this._emitReconnectStateDump(client, gameState);
 		}
 		//Else set them as a spectator (might not have to do anything server side)
 	//TODO: Broadcast paths and chat logs too
@@ -323,6 +322,7 @@ class GameSession {
 	}
 
 	resetSessionStatusAfterGame() {
+		this.game.clearTimers();
 		this.game = null;
 		this.gameClientSet = null;
 		this.votedToReset = new Set;

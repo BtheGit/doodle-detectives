@@ -29,7 +29,6 @@ class Game {
 			},
 			turnList: null, //{id, name, socket, color, isFake}
 			currentTurn: null,
-			currentTurnTimeout: null,
 			fakeGuess: '',
 			fakePlayer: null
 		};
@@ -37,6 +36,7 @@ class Game {
 		this.votesToApprove = new Map;
 		this.isFakeWinner = false;
 		this.isFakeFound = false;
+		this.timers = [];
 
 		//Basic Setup
 		this.state.playerList = this._setupPlayers(players);
@@ -111,10 +111,11 @@ class Game {
 		console.log('Starting first turn');
 
 		//Players have 10 seconds to prepare before the drawing phase starts
-		setTimeout(() => {
+		const timer = setTimeout(() => {
 			this.state.currentPhase = DRAWING;
 			this.nextTurn()
 		}, 10000);
+		this.timers.push(timer)
 	};
 
 	//############ EMITTERS ###############
@@ -304,7 +305,7 @@ class Game {
 	nextTurn() {
 		const turns = this.state.turnList
 		if (!turns.length) {
-			clearTimeout(this.state.currentTurnTimeout)
+			this.clearTimers();
 			this._initiateFakeVoteSequence();
 		}
 		else {
@@ -314,9 +315,16 @@ class Game {
 		}
 	}
 
+	clearTimers() {
+		this.timers.forEach(timer => {
+			clearTimeout(timer);
+		});
+	}
+
 	_startNextTurnTimer(turnId) {
-		clearTimeout(this.state.currentTurnTimeout)
-		this.state.currentTurnTimeout = setTimeout(() => this._endTurnTimer(turnId), 17000);
+		this.clearTimers();
+		const timer = setTimeout(() => this._endTurnTimer(turnId), 17000);
+		this.timers.push(timer);
 	}
 
 	/**

@@ -1,7 +1,7 @@
 const	{ gameSessionsMap, lobbyUsers, activePlayersMap } = require('../../TEMPdb/db.js'),
 			{ generateChatPacket, broadcastSession } 					= require('./socketHelpers'),
 			gameroomSocketHandlers 														= require('./gameroomHandlers'),
-			{ generateRandomColor, generateRandomId } 				= require('./gameroomHelpers'),
+			{ generateRandomId } 															= require('./gameroomHelpers'),
 			GameClient 																				= require('./GameClient'),
 			GameSession 																			= require('./GameSession');
 
@@ -38,7 +38,7 @@ function doodle(io) {
 					  sessionId: session.id,
 					  clientId: client.id,
 					  clientName: client.name,
-					  color: generateRandomColor(),
+					  color: client.color,
 					  chatLog: session.getChatLog(),
 					  paths: session.getPaths()
 				}

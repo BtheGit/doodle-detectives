@@ -1,10 +1,12 @@
+const { generateRandomColor } = require('./gameroomHelpers');
+
 class GameClient {
 	constructor(socket = null, name, id, dbId) {
 		this.socket = socket;
 		this.name = name;
 		this.id = id;
 		this.dbId = dbId;
-		this.color = '';
+		this.color = generateRandomColor();
 		this.session = null;
 	}
 
