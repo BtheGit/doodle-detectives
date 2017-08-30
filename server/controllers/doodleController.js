@@ -23,11 +23,7 @@ exports.rules = (req, res) => {
 //This is a hack to avoid the issue of improperly locating static resources because of 
 //different url structure for existing rooms
 exports.room = (req, res) => {
-	if(!req.gameSession) {
-		console.log('No gameSession detected, redirecting back to lobby')
-		res.redirect('/doodle/lobby')
-	} 
-	else {
+	if(req.gameSession) {
 		res.sendFile('index.html', {root: './server/public/cra-doodle/'})
 	}
 }
@@ -42,7 +38,6 @@ exports.createRoom = (req, res, next) => {
 	const sessionId = new Date().valueOf() + generateRandomId()
 	const gameSession = createGameSession(sessionId);
 	req.gameSession = gameSession;
-	console.log('GAME SESSION CREATED', req.gameSession)
 	next();
 }
 
@@ -76,24 +71,28 @@ exports.createClient = (req,res, next) => {
 	}
 	else {
 		//Don't let players join multiple sessions. Delete dangling session if it was just created and empty.
-		if(activePlayersMap.has(req.user.id)) {
-			res.redirect('/doodle/lobby')
-			if(!req.gameSession.clients.size) {
-				gameSessionsMap.delete(req.gameSession.id)
+		const clientIdIndex = req.gameSession.returnClientsIds().indexOf(req.user.id);
+		if(clientIdIndex !== -1) {
+			const userInMap = activePlayersMap.get(req.user.id)
+			console.log(userInMap)
+			if(!userInMap.socket || !userInMap.socket.connected || !userInMap.session) {
+				//Connected client is actually a phantom not attached to a session
+				//Let's help him shuffle off this mortal coil
+				activePlayersMap.delete(req.user.id);
+				req.gameSession.deleteClient(req.user.id);
+				setupNewClient(req.user.name, req.user.id, req.gameSession, activePlayersMap);
+				next();
+			} 
+			else {
+				if(!req.gameSession.clients.size) {
+					gameSessionsMap.delete(req.gameSession.id);
+				}
+				res.redirect('/doodle/lobby');
 			}
 		}
 		else {
-			//TODO Check it's current session id
-			//TODO If it matches current url, don't change it (allowing for player reconnects)
-			//TODO If it doesn't match, delete and create new client
-			const randomID = new Date().valueOf() + generateRandomId(16)
-			// The original idea of using the DB id was to be able to assist in reconnects. But until that is implemented
-			// I think it's better to use a tempId that is safe to broadcast to other players (even though I've
-			// already largely implemented the game working around that limitation, I will use it in color matching at least)
-			client = new GameClient(null, req.user.name, randomID, req.user.id); //Socket will be setup on page load
-			activePlayersMap.set(req.user.id, client)
-			req.gameSession.join(client)
-			next()	
+			setupNewClient(req.user.name, req.user.id, req.gameSession, activePlayersMap);
+			next();
 		}
 	}
 }
@@ -111,3 +110,18 @@ function createGameSession(id) {
 	return session;
 }
 
+function setupNewClient(name, id, session) {
+	//TODO Check it's current session id
+	//TODO If it matches current url, don't change it (allowing for player reconnects)
+	//TODO If it doesn't match, delete and create new client
+	const randomID = new Date().valueOf() + generateRandomId(16)
+	client = new GameClient(null, name, randomID, id); //Socket will be setup on page load
+	activePlayersMap.set(id, client)
+	session.join(client)
+}
+
+function purgePlayers() {
+	//Iterate through all clients in sessions who don't have sockets disconnected/sessions and purge them
+	//Create an array of all clients in all activesessions. 
+	//Create an array of all clients in activeplayersmap
+}

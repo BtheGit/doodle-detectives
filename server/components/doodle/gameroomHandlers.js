@@ -58,7 +58,7 @@ const gameroomSocketHandlers = (socket, client, session, gameSessionsMap, active
 
 			console.log('Client disconnected from session', session.id);
 			session.leave(client);
-			activePlayersMap.delete(client.dbId);
+			// activePlayersMap.delete(client.dbId);
 
 			//Update clients when a player disconnects
 			//Or terminate session altogether

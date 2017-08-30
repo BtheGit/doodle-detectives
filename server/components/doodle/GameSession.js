@@ -332,6 +332,18 @@ class GameSession {
 		this.broadcastSessionState();
 	}
 
+	returnClientsIds() {
+		return Array.from(this.clients).map(client => client.dbId)
+	}
+
+	returnClient(clientId) {
+		return Array.from(this.clients).filter(client => client.dbId === clientId)[0]
+	}
+
+	deleteClient(clientId) {
+		this.clients.delete(this.returnClient(clientId));
+	}
+
 	/**
 	 * A set of User Ids (equal to database id) that are built before each game
 	 * and not changed. At the end of every game they will be set back to null.
