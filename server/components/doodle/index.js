@@ -31,7 +31,7 @@ function doodle(io) {
 				//HERE IS WHERE WE SHOULD TRIGGER THE REJOIN LOGIC SO WE HAVE THE SOCKET
 				//TO WORK WITH
 				if(session.currentSessionStatus === 'GAMEACTIVE') {
-					session.reJoinClient(client)
+					session.rejoinClient(client)
 				}
 
 				const payload = {

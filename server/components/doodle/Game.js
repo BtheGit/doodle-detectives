@@ -10,6 +10,7 @@ const DISPLAYSECRET = 'DISPLAYSECRET',
 			DRAWING 			= 'DRAWING',
 			FAKEVOTE 			= 'FAKEVOTE',
 			GUESSVOTE 		= 'GUESSVOTE',
+			GUESSAPPROVAL = 'GUESSAPPROVAL',
 			GAMEOVER 			= 'GAMEOVER';
 
 class Game {
@@ -265,6 +266,7 @@ class Game {
 		}
 		else {
 			this.isFakeFound = true;
+			this.state.currentPhase = GUESSVOTE;
 			this._emitFakeFoundPromptForGuess();
 		}
 	}
@@ -339,12 +341,29 @@ class Game {
 		}
 	}
 
+	/**
+	 * Votes are sent from client, passed from gameroomHandlers through session to here.
+	 * Check if the client has already voted before adding to avoid duplicates (sets
+	 * only prevent duplicates if the vote is for the same player)
+	 * After adding a vote, check to see if everybody has voted to determine whether to trigger
+	 * a tally. 
+	 * TODO: When checking size make sure votes come from unique players
+	 * 
+	 * @param {Object} vote [Keys = id, vote ; vote is currently a color rather than id (TODO)]
+	 */
 	addVoteForFake(vote) {
-		this.fakeVotes.add(vote)
-		if(this.fakeVotes.size === this.state.playerList.length) {
-			this._tallyFakeVotes()
+		if(!this.lookupHasVotedForFake(vote.id)) {
+			this.fakeVotes.add(vote)
+			if(this.fakeVotes.size === this.state.playerList.length) {
+				this._tallyFakeVotes()
+			}		
 		}
 	}
+
+	lookupHasVotedForFake(id) {
+		return Array.from(this.fakeVotes).some(vote => vote.id === id);
+	}
+
 
 	addVoteToApproveGuess(client, vote) {
 		if(!this.votesToApprove.has(client)) {
@@ -355,8 +374,13 @@ class Game {
 		}
 	}
 
+	lookupHasVotedToApproveGuess(id) {
+		return Array.from(this.votesToApprove).some(vote => vote.id === id);
+	}
+
 	receiveFakeGuess(guess) {
 		this.state.fakeGuess = guess;
+		this.state.currentPhase = GUESSAPPROVAL
 		this._emitFakeGuessForApproval(guess);
 	}
 

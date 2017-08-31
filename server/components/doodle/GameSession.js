@@ -20,6 +20,7 @@ const DISPLAYSECRET = 'DISPLAYSECRET',
 			DRAWING 			= 'DRAWING',
 			FAKEVOTE 			= 'FAKEVOTE',
 			GUESSVOTE 		= 'GUESSVOTE',
+			GUESSAPPROVAL = 'GUESSAPPROVAL',
 			GAMEOVER 			= 'GAMEOVER';
 
 
@@ -203,29 +204,32 @@ class GameSession {
 			category: gameState.secret.category,
 			secret: isFake ? 'XXX' : gameState.secret.secret
 		};
+		const fakeVote = {
+			hasVoted: this.game.lookupHasVotedForFake(client.id) ? true : false
+		}
+		const fakeGuess = {
+			hasGuessed: isFake && this.game.state.fakeGuess ? true : false
+		}
+		const guessApproval = {
+			hasVoted: this.game.lookupHasVotedToApproveGuess(client.id),
+			guess: this.game.state.fakeGuess || ''
+		}
 
-		//This is what I will switch to later
-		// const currentPlayerId = gameState.currentTurn.id; 
-
-		//Create a packet with:
-		//gamephase, color, category, secret, isFake, currentPlayer, isMyTurn, 
-		//playerColors object,
-		//##if it is myTurn we'll have to manually set the timer to match the server
-		//##(come back to that later. For now the player should just be able to
-		//##draw until the server override)
-		//
-		//For now, the level of complexity with reconnecting during various votes is
-		//a bit harder. We'll stick to just the drawing phase at the moment.
 		const packet = {
 			currentPhase,
 			isFake,
 			secret,
+			fakeVote,
+			fakeGuess,
+			guessApproval
 		}
 
-		//We'll have to set specific updates based on phase
+		//For variables not available during all phases
 		if(currentPhase === DRAWING) {
 			packet.isMyTurn = gameState.currentTurn.dbId === client.dbId;
 			packet.currentPlayerName = gameState.currentTurn.name;
+			//This is what I will switch to later when I stop using color/name to id players
+			// const currentPlayerId = gameState.currentTurn.id; 
 		}
 
 		client.socket.emit('packet', {
@@ -244,7 +248,7 @@ class GameSession {
 		})	
 	}
 
-	reJoinClient(client) {
+	rejoinClient(client) {
 		//If a player is already in the gameClientSet (ie reconnecting)
 		//Broadcast a full state dump and tell the client to resume
 		if(this.gameClientSet.has(client.dbId)) {

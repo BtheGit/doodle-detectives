@@ -58,7 +58,6 @@ exports.joinRoom = (req, res, next) => {
 	// }
 	//TODO If full already redirect to lobby with flash 'Full'
 	
-	//Attach gameSessionto req
 	req.gameSession = gameSession
 	next();
 }
