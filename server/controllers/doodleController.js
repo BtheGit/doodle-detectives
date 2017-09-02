@@ -24,7 +24,10 @@ exports.rules = (req, res) => {
 //different url structure for existing rooms
 exports.room = (req, res) => {
 	if(req.gameSession) {
-		res.sendFile('index.html', {root: './server/public/cra-doodle/'})
+		res.sendFile('index.html', {root: './server/public/cra-doodle/'});
+	}
+	else {
+		res.redirect('back');
 	}
 }
 
@@ -51,14 +54,11 @@ exports.joinRoom = (req, res, next) => {
 		//TODO set Flash message for room not found
 		next()
 	}
-	//If game already in session, redirect to lobby with flash 'Game already started. Can't join.''
-	// if(gameSession.currentSessionStatus === 'isGameActive') {
-	// 	//TODO: Flash 'Game already started. Can't join.'
-	// 	next()
-	// }
-	//TODO If full already redirect to lobby with flash 'Full'
+	if(gameSession.clients.size < gameSession.MAX_ROOM_OCCUPANCY) {
+		req.gameSession = gameSession
+	}
+	//TODO: Else add flash indicating room full
 	
-	req.gameSession = gameSession
 	next();
 }
 

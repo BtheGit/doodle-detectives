@@ -27,6 +27,7 @@ const DISPLAYSECRET = 'DISPLAYSECRET',
 class GameSession {
 	constructor(id) {
 		this.id = id;
+		this.MAX_ROOM_OCCUPANCY = 3;
 		this.clients = new Set;
 		this.votedToBegin = new Set;
 		this.votedToReset = new Set;
@@ -82,7 +83,7 @@ class GameSession {
 	//GAME Will initialize here when all votes have been collected.
 	_updateVoteToBeginStatus() {
 		if(this.currentSessionStatus !== GAMEACTIVE){
-			if(this.clients.size === this.votedToBegin.size) { 
+			if(this.clients.size === this.votedToBegin.size && this.votedToBegin.size >= MINIMUM_PLAYERS_FOR_GAME) { 
 				this.currentSessionStatus = WAITINGTOSTART; //TODO: Is this redundant?
 				this.initGame();
 			}
@@ -264,7 +265,6 @@ class GameSession {
 	//TODO: Broadcast paths and chat logs too
 	}
 
-	//TODO: make sure a maximum of 8 can join room
 	join(client) {
 		if(client.session) {
 			throw new Error ('Client already in session')
@@ -278,18 +278,20 @@ class GameSession {
 		if(client.session !== this) {
 			throw new Error('Client not in session');
 		}
-		//If they have already voted to start game we want to remove that vote
-		if(this.votedToBegin.has(client)) {
-			this.removeVoteToBegin(client);
-		}
+		else {
+			this.clients.delete(client);
+			client.session = null;
+			this._checkPlayerQuotas();
 
-		if(this.votedToReset.has(client)) {
-			this.removeVoteToReset(client);
-		}
+			//If they have already voted to start game we want to remove that vote
+			if(this.votedToBegin.has(client)) {
+				this.removeVoteToBegin(client);
+			}
 
-		this.clients.delete(client);
-		client.session = null;
-		this._checkPlayerQuotas();
+			if(this.votedToReset.has(client)) {
+				this.removeVoteToReset(client);
+			}
+		}
 	}
 
 	//This is triggered in _updateVoteToBeginStatus() when all votes have been collected

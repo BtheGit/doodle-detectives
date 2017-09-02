@@ -10,7 +10,8 @@ exports.generateSessionsList = (map) => {
 		let clients = Array.from([...session.clients]);
 		clients = clients.map(client => client.name).join(', ');
 		const pop = session.clients.size;
-		sessionsList.push({sessionId, clients, pop})
+		const isGameActive = session.currentSessionStatus === 'GAMEACTIVE';
+		sessionsList.push({sessionId, clients, pop, isGameActive})
 	})
 	return sessionsList;
 }

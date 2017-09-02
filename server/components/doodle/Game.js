@@ -145,7 +145,7 @@ class Game {
 				payload: {
 					secret: {
 						category: secret.category,
-						secret: `${player.isFake ? 'XXX' : secret.secret}`
+						secret: `${player.isFake ? '---' : secret.secret}`
 					},
 					fakeIsMe: player.isFake,
 					displayLength: 10
@@ -205,6 +205,7 @@ class Game {
 		this.state.playerList.map(player => {
 			player.socket.emit('packet', packet);
 		});
+
 	};
 
 	_emitFakeFoundPromptForGuess() {
@@ -288,9 +289,19 @@ class Game {
 	 * constructor
 	 **/
 	_concludeGame() {
+		const resultsMessage = this._generateResultsMessage()
 		this._emitGameOverResults();
+		this.session.broadcastSystemMessage(resultsMessage);
 		this.session.resetSessionStatusAfterGame();
 	}
+
+	_generateResultsMessage() {
+		return (`${this.state.isFakeWinner ? 'The Fake wins' : 'The Detectives Win'}!
+				The Fake was ${this.state.fakePlayer.name}.
+				The secret was ${this.state.secret.secret}.
+				`)
+	}
+
 
 	retrieveState() {
 		return this.state;

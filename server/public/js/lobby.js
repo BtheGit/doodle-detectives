@@ -40,9 +40,8 @@ function updateRoomsMenu(array = []) {
   let content = '';
   if(array.length) {
     for (let i = 0; i < array.length; i++) {
-      const link = array[i].pop >= 8 
-        ? `<p class="room-button full-button">ROOM FULL</p>` 
-        : `<a class="room-button join-button" href="/doodle/room/${array[i].sessionId}" >JOIN</a>`
+      console.log(array[i])
+      const link = createLink(array[i].pop, array[i].sessionId, array[i].isGameActive)
       const room =
          `<div class="room-container">
           <div class="room-name">
@@ -61,6 +60,22 @@ function updateRoomsMenu(array = []) {
     content=`<div class='no-cases'><p>NO OPEN CASES</p></div>`
   }
   menuContainer.innerHTML = content;
+}
+
+/**
+ * [createLink description]
+ * @return {[type]} [description]
+ */
+function createLink(roomPop, sessionId, isGameActive) {
+  if(roomPop >= 8) {
+    return `<p class="room-button full-button">ROOM FULL</p>`;
+  }
+  else if(isGameActive) {
+    return `<a class="room-button join-button game-active" href="/doodle/room/${sessionId}" >PLAYING</a>`;
+  }
+  else {
+    return `<a class="room-button join-button" href="/doodle/room/${sessionId}" >JOIN</a>`;
+  }
 }
 
 /**
