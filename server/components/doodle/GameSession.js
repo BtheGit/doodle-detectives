@@ -41,6 +41,37 @@ class GameSession {
 		// this.usedSecrets = [] //figure out the best way to track variables like secrets/scores between games
 	}
 
+	join(client) {
+		if(client.session) {
+			throw new Error ('Client already in session')
+		}
+		this.clients.add(client);
+		client.session = this;
+		this._checkPlayerQuotas();
+	}
+
+	leave(client) {
+		if(client.session !== this) {
+			throw new Error('Client not in session');
+		}
+		else {
+			this.clients.delete(client);
+			client.session = null;
+			this._checkPlayerQuotas();
+
+			//If some clients have already voted to begin, we need to restart the vote to avoid limbo issues
+			if(this.currentSessionStatus === WAITINGTOSTART) {
+				if(this.votedToBegin.size) {
+					this.broadcastHardReset();
+				}
+			}
+
+			if(this.votedToReset.has(client)) {
+				this.removeVoteToReset(client);
+			}
+		}
+	}
+
 	//CHAT LOG
 	
 	/**
@@ -75,10 +106,11 @@ class GameSession {
 		this._updateVoteToBeginStatus();
 	}
 
-	removeVoteToBegin(client) {
-		this.votedToBegin.delete(client);
-		this._updateVoteToBeginStatus();
-	}
+	//CURRENTLY DEPRECATED
+	// removeVoteToBegin(client) {
+	// 	this.votedToBegin.delete(client);
+	// 	this._updateVoteToBeginStatus();
+	// }
 
 	//GAME Will initialize here when all votes have been collected.
 	_updateVoteToBeginStatus() {
@@ -263,35 +295,6 @@ class GameSession {
 		}
 		//Else set them as a spectator (might not have to do anything server side)
 	//TODO: Broadcast paths and chat logs too
-	}
-
-	join(client) {
-		if(client.session) {
-			throw new Error ('Client already in session')
-		}
-		this.clients.add(client);
-		client.session = this;
-		this._checkPlayerQuotas();
-	}
-
-	leave(client) {
-		if(client.session !== this) {
-			throw new Error('Client not in session');
-		}
-		else {
-			this.clients.delete(client);
-			client.session = null;
-			this._checkPlayerQuotas();
-
-			//If they have already voted to start game we want to remove that vote
-			if(this.votedToBegin.has(client)) {
-				this.removeVoteToBegin(client);
-			}
-
-			if(this.votedToReset.has(client)) {
-				this.removeVoteToReset(client);
-			}
-		}
 	}
 
 	//This is triggered in _updateVoteToBeginStatus() when all votes have been collected
