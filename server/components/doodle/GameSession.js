@@ -1,4 +1,6 @@
 const Game = require('./Game');
+const SECRETS = require('../../TEMPdb/secretsDB.js');
+const { SecretsList } = require('./gameroomHelpers.js');
 
 //TODO: Track Room Players current scores, persist them after each game
 //TODO: Convert string constants to actual constants
@@ -37,9 +39,9 @@ class GameSession {
 		this.game = null;
 		//gameClientSet will be used for reconnecting player verifications
 		this.gameClientSet = null;
-
-		// this.usedSecrets = [] //figure out the best way to track variables like secrets/scores between games
+		this.secretsList = new SecretsList(SECRETS); 
 	}
+
 
 	join(client) {
 		if(client.session) {
@@ -307,7 +309,8 @@ class GameSession {
 		//The set will be used during the current game for player reconnects
 		this.gameClientSet = this._createGameClientSet(players);
 		//Games will not be recycled. Each game will be a new instance.
-		this.game = new Game(this, players)
+		//We will create the secret here so we can track them between games and avoid repeats
+		this.game = new Game(this, players, this.secretsList.get())
 		this.broadcastSessionState();
 	}
 

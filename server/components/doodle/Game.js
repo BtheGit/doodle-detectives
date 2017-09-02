@@ -14,20 +14,17 @@ const DISPLAYSECRET = 'DISPLAYSECRET',
 			GAMEOVER 			= 'GAMEOVER';
 
 class Game {
-	constructor(session, players) {
+	constructor(session, players, secret) {
 		//Give us access to session socket handlers for broadcasting
 		this.session = session; 
 		//NB: For the current implementation, the players cannot change after this point.
 		//Players leaving or not participating will wreck the game.
 		
 		this.state = {
+			secret,
 			currentPhase: '',
 			playerList: [],
 			activePlayer: [],
-			secret: {
-				category: '',
-				secret: ''
-			},
 			turnList: null, //{id, name, socket, color, isFake}
 			currentTurn: null,
 			fakeGuess: '',
@@ -43,7 +40,6 @@ class Game {
 		this.state.playerList = this._setupPlayers(players);
 		this.emitPlayersColorUpdate(this.state.playerList);
 		this.state.turnList = this._createTurnList(this.state.playerList);
-		this.state.secret = this._generateSecret(SECRETS);
 
 		//Initialize Game
 		console.log('Starting Game');
@@ -90,12 +86,6 @@ class Game {
 			return turn
 		})
 		return playerTurns;
-	};
-
-	//TODO: Add secret to list of used secrets
-	//TODO: if secret is already used, generate a different one
-	_generateSecret(secrets) {
-		return secrets[Math.floor(Math.random() * secrets.length)];
 	};
 
 	_setupPlayers(players) {
